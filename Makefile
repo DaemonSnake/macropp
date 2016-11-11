@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 
 %.o: %.c
-	set -e && cpp $< $(CFLAGS) | \
+	cpp $< $(CFLAGS) | \
 	./postfix/postfix | cpp $(CFLAGS) | cpp $(CFLAGS) | \
 	gcc -c -x c $(CFLAGS) -o $@ /dev/stdin;
 

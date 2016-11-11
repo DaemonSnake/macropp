@@ -18,13 +18,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-SRC =		src/main.c	\
-		src/test.c	\
-		src/tools.c
+SRC =		src/main.c		\
+		src/look.c		\
+		src/tools.c		\
+		src/string_tools.c	\
+		src/commands.c		\
+		src/thread.c
 
 OBJ =		$(SRC:.c=.o)
 
-CFLAGS =	-W -Wall -Wextra -Iinc
+CFLAGS =	-W -Wall -Wextra -Iinc -g3 -pthread
 
 NAME =		postfix
 
@@ -33,6 +36,9 @@ $(NAME):	$(OBJ)
 
 test:		$(NAME)
 		cpp example/EX.c -P | ./$(NAME)
+
+cpp_test:	$(NAME)
+		cpp example/foreach.cpp -P | ./$(NAME) | g++ -x c++ /dev/stdin -o example/$@
 
 clean:
 		rm -f $(OBJ)

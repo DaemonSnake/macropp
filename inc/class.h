@@ -27,22 +27,27 @@
     typedef struct name *name;                                  \
     append_macro(OBJECTS, name)                                 \
     UNDEF(CLASS)                                                \
+    UNDEF(SUPER)                                                \
     PROC(define CLASS(x) MACRO_GLUE_2_(name, x))                \
+    PROC(define SUPER(x) MACRO_GLUE_2_(super, x))               \
                                                                 \
     struct name ## __private_data __POSTFIX__(@ end_class @)
 
 #define end_class                                                       \
     ;                                                                   \
                                                                         \
-    struct CLASS(__vtable) {                                            \
-        _PRAGMA(_) PROC_2(ifdef METHODS_VTABLE)                         \
-        _PRAGMA(_) METHODS_VTABLE;                                      \
-        _PRAGMA(_) PROC_2(endif) _PRAGMA(_)                             \
-    };                                                                  \
+    struct CLASS(__vtable);                                             \
                                                                         \
     struct CLASS(__private) {                                           \
         const struct CLASS(__vtable) * const _vtable;                   \
         struct CLASS(__private_data);                                   \
+    };                                                                  \
+                                                                        \
+    struct CLASS(__vtable) {                                            \
+        struct SUPER(__vtable);                                         \
+        _PRAGMA(_) PROC_2(ifdef METHODS_VTABLE)                         \
+        _PRAGMA(_) METHODS_VTABLE;                                      \
+        _PRAGMA(_) PROC_2(endif) _PRAGMA(_)                             \
     };                                                                  \
                                                                         \
     struct CLASS() {                                                    \
@@ -62,6 +67,12 @@
         _PRAGMA(_) PROC_2(endif) _PRAGMA(_)                             \
     };                                                                  \
                                                                         \
+    __attribute__((constructor))                                        \
+    void CLASS(__type_constructor)()                                    \
+    {                                                                   \
+        /*TODO*/                                                        \
+    }                                                                   \
+                                                                        \
     CLASS() CLASS(__shallow_new)()                                      \
     {                                                                   \
         CLASS() ret = malloc(sizeof(struct CLASS()));                   \
@@ -74,6 +85,8 @@
     }                                                                   \
                                                                         \
     _PRAGMA(_) PROC(else)                                               \
+                                                                        \
+    extern const struct CLASS(__vtable) CLASS(__vtable_instance);       \
                                                                         \
     CLASS() CLASS(__shallow_new)();                                     \
     METHODS_PROTO_CODE                                                  \

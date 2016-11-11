@@ -4,15 +4,15 @@ buffer new(int in, int out)
 {
     buffer this = malloc(sizeof(struct buffer));
 
-    if (this)
-    {
-        $.data = 0;
-        $.size = 0;
-        $.index = 0;
-        $.in = in;
-        $.out = out;
-        $.stream_finished = false;
-    }
+    if (!this)
+        return NULL;
+    $.data = NULL;
+    $.size = 0;
+    $.index = 0;
+    $.in = in;
+    $.out = out;
+    $.stream_finished = false;
+    $.thread = NULL;
     return this;
 }
 
@@ -20,16 +20,32 @@ buffer new_string(char *str, int out)
 {
     buffer this = malloc(sizeof(struct buffer));
 
-    if (this)
-    {
-        $.data = str;
-        $.size = strlen(str);
-        $.index = 0;
-        $.in = -1;
-        $.out = out;
-        $.stream_finished = false;
-    }
+    if (!this)
+        return NULL;
+    $.data = str;
+    $.size = strlen(str);
+    $.index = 0;
+    $.in = -1;
+    $.out = out;
+    $.stream_finished = false;
+    $.thread = NULL;
     return this;
+}
+
+buffer new_transfer(buffer this, int new_in, int out)
+{
+    buffer tmp = new_string($.data, out);
+
+    tmp->in = $.in;
+    tmp->index = $.index;
+    tmp->thread = $.thread;
+    $.in = new_in;
+    $.data = 0;
+    $.size = 0;
+    $.stream_finished = false;
+    $.index = 0;
+    $.thread = 0;
+    return tmp;
 }
 
 void delete(buffer this)
@@ -41,7 +57,7 @@ void delete(buffer this)
 void exit_(buffer this)
 {
     delete(this);
-    exit(1);
+    exit(42);
 }
 
 void proccess(buffer this)
@@ -73,9 +89,21 @@ void __read(buffer this)
         return ;
     if ($.data == NULL)
         $.data = malloc(SIZE + 1);
-    if ($.in == -1 || (len = read($.in, $.data + $.index, SIZE - $.index)) <= 0) {
+    if ($.in == -1) {
         $.stream_finished = true;
         return ;
+    }
+    if ((len = read($.in, $.data + $.index, SIZE - $.index)) <= 0) {
+        if ($.thread != NULL) {
+            close($.in);
+            pthread_join(*$.thread, (void **)&$.in);
+            free($.thread);
+            $.thread = NULL;
+        }
+        else {
+            $.stream_finished = true;
+            return ;
+        }
     }
     $.size += len;
     $.data[$.size] = 0;

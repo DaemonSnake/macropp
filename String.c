@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-#if __INCLUDE_LEVE__ != 0
+#if __INCLUDE_LEVEL__ != 0
 #pragma once
 #endif
 
@@ -42,6 +42,12 @@ class(String, Object)
     virtual const char * method(c_str)()
     {
         return $.c_str;
+    }
+
+    setter(c_str, value) {
+        free((char *)$.c_str);
+        $.c_str = strdup(value);
+        $.length = strlen(value);
     }
 
     // TODO

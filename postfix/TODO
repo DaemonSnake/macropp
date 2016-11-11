@@ -1,4 +1,8 @@
--handle characters in strings
+-handle characters in strings/char
+
 -instructions :
-  -> @BEFORE(@ "" @, "" @)
-  -> @AFTER(@ "" @, "" @)
+  -> __POSTFIX(@BEFORE X @, WITH @)
+  -> __POSTFIX(@AFTER X @, WITH @)
+  -> __POSTFIX(@BALENCED IN @, OUT @, WITH @)
+
+-replace COPY with a fork | thread system

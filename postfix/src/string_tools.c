@@ -19,36 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "../inc/Object.h"
-
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
-static Type Object__getType(struct Object__private *this) {
-    return this->type;
-}
-
-static void Object__dtor(struct Object__private *this) {
-    (void)this;
-}
-
-const struct Object__vtable Object__vtable_instance = {
-    (Type(*)(Object))Object__getType,
-    (void(*)(Object))Object__dtor
-};
-
-void Object__ctor_Type(struct Object__private *this, Type type)
+int skip_separator(char *string)
 {
-    this->type = type;
+    int size = (string ? strlen(string) : 0);
+
+    if (size <= 0)
+        return 0;
+    for (int i = 0; i < size; i++)
+        if (string[i] != ' ' && string[i] != '\t' && string[i] != '\n')
+            return i;
+    return 0;
 }
 
-Object Object__shallow_new()
+static char *min_str(char *l, char *r) { return ((l < r && l != NULL) || (r == NULL) ? l : r); }
+
+char *get_argument(char *arg_list, int index)
 {
-    Object ret = malloc(sizeof(struct Object));
-    bzero(ret, sizeof(struct Object));
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-    *(void **)&ret->_vtable = &Object__vtable_instance;
-    #pragma GCC diagnostic pop
-    return ret;
+    for (int i = 0; arg_list > (char *)0x4 && i < index; arg_list = (i++, strstr(arg_list, " @, ") + 4));
+    if (arg_list <= (char *)0x4)
+        return NULL;
+    return strndup(arg_list, min_str(strstr(arg_list, " @, "), arg_list + strlen(arg_list)) - arg_list);
+}
+
+void free_all(void *front, ...)
+{
+    va_list ap;
+
+    free(front);
+    va_start(ap, front);
+    while ((front = va_arg(ap, void *)) != NULL)
+        free(front);
+    va_end(ap);
+}
+
+void raii_free(void *arg)
+{
+    free(*(void **)arg);
+    *(void **)arg = 0;
 }

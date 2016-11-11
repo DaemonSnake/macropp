@@ -26,21 +26,27 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <pthread.h>
 
 #define $ (*this)
 #define SIZE 2048
+#define FREE(front, args...) free_all(front, ##args, 0)
+#define RAII __attribute__((cleanup(raii_free)))
 
 typedef enum { false = 0, true } bool;
 typedef enum { PROCCESS, COPY } action_type;
 
-typedef struct buffer
+typedef struct buffer *buffer;
+struct buffer
 {
     char *data;
     int size;
     int index;
     int in, out;
     bool stream_finished;
-} *buffer;
+    pthread_t *thread;
+    buffer *next; //TO IMPLEMENT
+};
 
 buffer new(int in, int out);
 buffer new_string(char *str, int out);
@@ -49,8 +55,16 @@ void exit_(buffer this);
 void proccess(buffer this);
 void discard(buffer this);
 void __read(buffer this);
-char *look_for(buffer this, char *motif, action_type type);
-char *balanced_look_for(buffer this, char motif, char cancel, action_type type);
+char *look_for(buffer this, char *motif, char *before, action_type type);
+char *balanced_look_for(buffer this, char motif, char cancel, char *before, action_type type);
 void rec_postfix(buffer buf);
 int append_string(char **str, char *buf, int size);
 void update_index(buffer this, int index);
+int skip_separator(char *string);
+void handle_arguments(buffer buf, char *arguments);
+char *get_argument(char *arg_list, int index);
+void free_all(void *, ...);
+void raii_free(void *);
+buffer new_transfer(buffer this, int new_in, int out);
+void spawn_look(buffer buf, char *motif, char *before, char *after);
+void spawn_balenced_look(buffer buf, char in, char out, char *before, char *after);

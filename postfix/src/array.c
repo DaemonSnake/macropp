@@ -19,36 +19,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "../inc/Object.h"
+#include "inc.h"
 
-#include <string.h>
-#include <stdlib.h>
-
-static Type Object__getType(struct Object__private *this) {
-    return this->type;
-}
-
-static void Object__dtor(struct Object__private *this) {
-    (void)this;
-}
-
-const struct Object__vtable Object__vtable_instance = {
-    (Type(*)(Object))Object__getType,
-    (void(*)(Object))Object__dtor
-};
-
-void Object__ctor_Type(struct Object__private *this, Type type)
+thread_array array_init()
 {
-    this->type = type;
+    return thread_array {NULL, 0};
 }
 
-Object Object__shallow_new()
+void array_add(thread_array *this)
 {
-    Object ret = malloc(sizeof(struct Object));
-    bzero(ret, sizeof(struct Object));
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-    *(void **)&ret->_vtable = &Object__vtable_instance;
-    #pragma GCC diagnostic pop
-    return ret;
+    size++;
+    if ($.array == NULL || $.size == 0)
+        array = calloc(1, sizeof(thread_array));
+    else
+        array = realloc(array, sizeof(thread_array) * $.size);
+}
+
+void array_remove(thread_array *this)
+{
+    $.size--;
+    if (size == 1) {
+        free(array);
+        array = NULL;
+    }
+    else
+        array = realloc(sizeof(thread_array) * $.size);
 }

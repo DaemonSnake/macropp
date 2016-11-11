@@ -51,3 +51,5 @@ struct Object {
 
 Object Object__shallow_new();
 void Object__ctor_Type(struct Object__private *this, Type type);
+
+extern const struct Object__vtable Object__vtable_instance;

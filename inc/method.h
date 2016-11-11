@@ -34,7 +34,7 @@ PROC(define ___CALL_VIRTUAL(line, ret, name, arg_list, arg_list_p, body...) \
      PROC_2(define MACRO_GLUE_2_(METHODS_VTABLE_TOOL__, line)           \
             ret (*name) arg_list) _PRAGMA(_)                            \
      PROC_2(define MACRO_GLUE_2_(METHODS_NAME_TOOL__, line)             \
-            (ret (*) arg_list)&CLASS(__ ## name)) _PRAGMA(_)            \
+            . name = (ret (*) arg_list)&CLASS(__ ## name)) _PRAGMA(_) \
      PROC_2(define MACRO_GLUE_2_(METHODS_CODE_TOOL__, line)             \
             ret CLASS(__ ## name) arg_list_p body) _PRAGMA(_))
 
@@ -43,6 +43,29 @@ PROC(define ___CALL_VIRTUAL(line, ret, name, arg_list, arg_list_p, body...) \
     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \
     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \
     __POSTFIX__(@ ) @) ___CALL_VIRTUAL ( __LINE__,
+
+/* GET/SET */
+
+#define getter(name)                                            \
+    virtual typeof(((struct CLASS(__private) *)0)->name) method(get_ ## name)()
+
+#define setter(name, value)                                             \
+    virtual void method(set_ ## name)(typeof(((struct CLASS(__private) *)0)->name) value)
+
+//TODO: axM
+
+/* OVERRIDE */
+
+/* PROC(define ___CALL_OVERRIDE(line, ret, name, arg_list, arg_list_p, body...) \ */
+/*      PROC_2(define MACRO_GLUE_2_(METHODS_NAME_TOOL__, line)             \ */
+/*             . name = (ret (*) arg_list)&CLASS(__ ## name)) _PRAGMA(_)   \ */
+/*      PROC_2(define MACRO_GLUE_2_(METHODS_CODE_TOOL__, line)             \ */
+/*             ret CLASS(__ ## name) arg_list_p body) _PRAGMA(_)) */
+
+/* #define override                                                         \ */
+/*     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \ */
+/*     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \ */
+/*     __POSTFIX__(@ ) @) ___CALL_OVERRIDE ( __LINE__, */
 
 /* '*TOR' */
 
