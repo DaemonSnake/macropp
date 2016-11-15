@@ -19,9 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#define _GNU_SOURCE
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int skip_separator(char *string)
 {
@@ -56,8 +59,76 @@ void free_all(void *front, ...)
     va_end(ap);
 }
 
-void raii_free(void *arg)
+int string_index(char *motif, ...)
 {
-    free(*(void **)arg);
-    *(void **)arg = 0;
+    va_list ap;
+    char *tmp;
+
+    if (motif == NULL)
+        return -1;
+    va_start(ap, motif);
+    for (int index = 0; (tmp = va_arg(ap, char *)) != NULL; index++)
+        if (strcmp(motif, tmp) == 0)
+            return index;
+    va_end(ap);
+    return -1;
+}
+
+int int_index(char *str, char car)
+{
+    char *res = index(str, car);
+    return (res == NULL ? -1 : res - str);
+}
+
+char *replace_special_characters(char *str)
+{
+    char *read = str;
+    char *write = str;
+
+    if (str == NULL)
+        return NULL;
+    for (write = str; *read != '\0'; read++, write++)
+    {
+        if (*read == '\\' && read[1] != '\0')
+        {
+            int i = int_index("abfnrtv", read[1]);
+            if (i == -1)
+                goto no_backslash;
+            *write = "\a\b\f\n\r\t\v"[i];
+            read++;
+        }
+        else if (read != write)
+        no_backslash:
+            *write = *read;
+    }
+    *write = '\0';
+    return str;
+}
+
+void print_strs(int fd, ...)
+{
+    va_list ap;
+    char *str;
+
+    va_start(ap, fd);
+    while ((str = va_arg(ap, char *)) != NULL)
+        write(fd, str, strlen(str));
+    va_end(ap);
+}
+
+void print_size(int fd, size_t i)
+{
+    char *number;
+
+    asprintf(&number, "%lu", i);
+    write(fd, number, strlen(number));
+    free(number);
+}
+
+void free_ptr(void *ptr)
+{
+    if (!ptr || !(*(void **)ptr))
+        return ;
+    free(*(void **)ptr);
+    *(void **)ptr = NULL;
 }

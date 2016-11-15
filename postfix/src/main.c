@@ -4,7 +4,8 @@ int main()
 {
     buffer buf = new(0, 1);
 
-    while (look_for(buf, "__POSTFIX__(@", NULL, PROCCESS))
+    while (look_for(buf, "__POSTFIX__(@", NULL, PROCCESS)) {
         handle_arguments(buf, look_for(buf, " @)", NULL, COPY));
+    }
     delete(buf);
 }

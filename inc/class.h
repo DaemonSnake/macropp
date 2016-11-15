@@ -57,6 +57,8 @@
                                                                         \
     _PRAGMA(_) PROC(if __INCLUDE_LEVEL__ == 0)                          \
                                                                         \
+    static CLASS() CLASS(__shallow_new)();                              \
+                                                                        \
     _PRAGMA(_) PROC_2(ifdef METHODS_CODE)                               \
     _PRAGMA(_) METHODS_CODE;                                            \
     _PRAGMA(_) PROC_2(endif) _PRAGMA(_)                                 \
@@ -67,13 +69,7 @@
         _PRAGMA(_) PROC_2(endif) _PRAGMA(_)                             \
     };                                                                  \
                                                                         \
-    __attribute__((constructor))                                        \
-    void CLASS(__type_constructor)()                                    \
-    {                                                                   \
-        /*TODO*/                                                        \
-    }                                                                   \
-                                                                        \
-    CLASS() CLASS(__shallow_new)()                                      \
+    static CLASS() CLASS(__shallow_new)()                               \
     {                                                                   \
         CLASS() ret = malloc(sizeof(struct CLASS()));                   \
         bzero(ret, sizeof(struct CLASS()));                             \
@@ -88,8 +84,9 @@
                                                                         \
     extern const struct CLASS(__vtable) CLASS(__vtable_instance);       \
                                                                         \
-    CLASS() CLASS(__shallow_new)();                                     \
-    METHODS_PROTO_CODE                                                  \
+    _PRAGMA(_) PROC_2(ifdef METHODS_PROTO_CODE)                         \
+    _PRAGMA(_) METHODS_PROTO_CODE                                       \
+    _PRAGMA(_) PROC_2(endif)                                            \
                                                                         \
     _PRAGMA(_) PROC(endif)                                              \
                                                                         \

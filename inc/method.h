@@ -21,16 +21,13 @@
  */
 #pragma once
 
-/* VIRTUAL */
+/* METHOD */
 
-#define ___METHOD_ADD_THIS(args...)                     \
-    (CLASS() this, ##args),                             \
-        (struct CLASS(__private) *this, ##args),
+PROC(define ___METHOD_ADD_THIS(args...)         \
+     (CLASS() this, ##args),                    \
+     (struct CLASS(__private) *this, ##args))
 
-#define method(name)                            \
-    , name, ___METHOD_ADD_THIS
-
-PROC(define ___CALL_VIRTUAL(line, ret, name, arg_list, arg_list_p, body...) \
+PROC(define ___CALL_METHOD(line, name, arg_list, arg_list_p, ret, body...) \
      PROC_2(define MACRO_GLUE_2_(METHODS_VTABLE_TOOL__, line)           \
             ret (*name) arg_list) _PRAGMA(_)                            \
      PROC_2(define MACRO_GLUE_2_(METHODS_NAME_TOOL__, line)             \
@@ -38,19 +35,45 @@ PROC(define ___CALL_VIRTUAL(line, ret, name, arg_list, arg_list_p, body...) \
      PROC_2(define MACRO_GLUE_2_(METHODS_CODE_TOOL__, line)             \
             ret CLASS(__ ## name) arg_list_p body) _PRAGMA(_))
 
-#define virtual                                                         \
+PROC(define ___CALL_METHOD2(line, name, arg_list, ret, body...)        \
+     ___CALL_METHOD(line, name, arg_list, ret, body))
+
+#define method                                                         \
     append_macro_dotcoma(METHODS_VTABLE, MACRO_GLUE(METHODS_VTABLE_TOOL__, __LINE__)) \
     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \
     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \
-    __POSTFIX__(@ ) @) ___CALL_VIRTUAL ( __LINE__,
+    ___CALL_METHOD2 (                                                   \
+                     __POSTFIX__(@ ) @, , @)                            \
+    __POSTFIX__(@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @)         \
+    __LINE__,
+
+/* ABSTRACT */
+
+PROC(define ___CALL_ABSTRACT(line, name, arg_list, arg_list_p, ret)     \
+     PROC_2(define MACRO_GLUE_2_(METHODS_VTABLE_TOOL__, line)           \
+            ret (*name) arg_list) _PRAGMA(_)                            \
+     PROC_2(define MACRO_GLUE_2_(METHODS_NAME_TOOL__, line)             \
+            . name = (ret (*) arg_list)0 _PRAGMA(_)))
+
+PROC(define ___CALL_ABSTRACT2(line, name, arg_list, ret)        \
+     ___CALL_ABSTRACT(line, name, arg_list, ret))
+
+#define abstract                                                         \
+    append_macro_dotcoma(METHODS_VTABLE, MACRO_GLUE(METHODS_VTABLE_TOOL__, __LINE__)) \
+    append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \
+    ___CALL_ABSTRACT2 (                                                   \
+                     __POSTFIX__(@LOOK ; @, ) @)                        \
+    __POSTFIX__(@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @)         \
+    __LINE__,
+
 
 /* GET/SET */
 
-#define getter(name)                                            \
-    virtual typeof(((struct CLASS(__private) *)0)->name) method(get_ ## name)()
+#define getter(name)                                                    \
+    method get_ ## name() typeof(((struct CLASS(__private) *)0)->name)
 
 #define setter(name, value)                                             \
-    virtual void method(set_ ## name)(typeof(((struct CLASS(__private) *)0)->name) value)
+    method set_ ## name(typeof(((struct CLASS(__private) *)0)->name) value) void
 
 //TODO: axM
 
@@ -69,15 +92,30 @@ PROC(define ___CALL_VIRTUAL(line, ret, name, arg_list, arg_list_p, body...) \
 
 /* '*TOR' */
 
+PROC(define __IN_CTOR__                                                 \
+     {                                                                  \
+         if (!this) this = (struct CLASS(__private) * )CLASS(__shallow_new)(); \
+         void __ctor_tool__())
+
+PROC(define __OUT_CTOR__ \
+     ; __ctor_tool__();  \
+     return (CLASS())this; \
+     })
+
 #define ctor(name)                                                      \
     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \
     append_macro_nosep(METHODS_PROTO_CODE, MACRO_GLUE(METHODS_CODE_PROTO_TOOL__, __LINE__)) \
-    __POSTFIX__(@ ) @) ___CALL_TOR ( __LINE__, ctor_ ## name, ___METHOD_ADD_THIS
+    ___CALL_TOR2 (                                                      \
+                  __POSTFIX__(@ __OUT_CTOR__) @, ,__IN_CTOR__ @)        \
+    __LINE__, ctor_ ## name, ___METHOD_ADD_THIS
 
 PROC(define ___CALL_TOR(line, name, arg_list, arg_list_p, body...) \
      PROC_2(define MACRO_GLUE_2_(METHODS_CODE_TOOL__, line)             \
-            void CLASS(__ ## name) arg_list_p body) _PRAGMA(_)           \
+            CLASS() CLASS(__ ## name) arg_list_p body) _PRAGMA(_)      \
      PROC_2(define MACRO_GLUE_2_(METHODS_CODE_PROTO_TOOL__, line)       \
-            void CLASS(__ ## name) arg_list_p;) _PRAGMA(_))
+            CLASS() CLASS(__ ## name) arg_list_p;) _PRAGMA(_))
+
+PROC(define ___CALL_TOR2(line, name, arg_list, body...)     \
+     ___CALL_TOR(line, name, arg_list, body))
 
 //TODO: DTOR

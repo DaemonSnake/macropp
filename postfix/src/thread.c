@@ -25,75 +25,32 @@ typedef struct
 {
     int pipe[2];
     buffer buf;
-    char *before, *after;
-    union {
-        struct {
-            char *motif;
-        };
-        struct {
-            char in, out;
-        };
-    };
-    enum { LOOK, BALENCED } type;
+    void (*function)(buffer, char *);
+    char *argument;
+    int offset;
 } data;
 
-static int thread_reader(data *this)
-{
-    if ($.type == LOOK) {
-        look_for($.buf, $.motif, $.before, PROCCESS);
-        free($.motif);
-    }
-    else
-        balanced_look_for($.buf, $.in, $.out, $.before, PROCCESS);
 
-    write($.buf->out, $.after, strlen($.after));
-    FREE($.before, $.after);
-    //NOT GOOD -> linked list of buffer instead and fixed pthread_t per buffer
-    while (!$.buf->stream_finished)
-    {
-        $.buf->index = $.buf->size;
-        proccess($.buf);
-        if ($.buf->thread)
-            __read($.buf);
-        else
-            break;
-    }
-    int tmp = $.buf->in;
-    delete($.buf);
+static void *thread_reader2(data *this)
+{
+    $.function($.buf, $.argument + $.offset);
+    $.buf->index = $.buf->size;
+    proccess($.buf);
     close($.pipe[1]);
-    free(this);
-    return tmp;
+    FREE($.argument, this);
+    return NULL;
 }
 
-void spawn_look(buffer buf, char *motif, char *before, char *after)
+void spawn_command(buffer buf, void(*function)(buffer, char *), char *arg, int offset)
 {
     data *argument = malloc(sizeof(data));
-    pthread_t *thread = malloc(sizeof(pthread_t));
+    pthread_t thread;
 
     pipe(argument->pipe);
-    argument->type =  LOOK;
-    argument->motif = motif;
-    argument->before = before;
-    argument->after = after;
-    argument->type = LOOK;
+    argument->function = function;
+    argument->argument = arg;
+    argument->offset = offset;
     argument->buf = new_transfer(buf, argument->pipe[0], argument->pipe[1]);
-    buf->thread = thread;
-    pthread_create(buf->thread, 0, (void* (*)(void*))thread_reader, argument);
-}
-
-void spawn_balenced_look(buffer buf, char in, char out, char *before, char *after)
-{
-    data *argument = malloc(sizeof(data));
-    pthread_t *thread = malloc(sizeof(pthread_t));
-
-    pipe(argument->pipe);
-    argument->type =  BALENCED;
-    argument->in = in;
-    argument->out = out;
-    argument->before = before;
-    argument->after = after;
-    argument->type = BALENCED;
-    argument->buf = new_transfer(buf, argument->pipe[0], argument->pipe[1]);
-    buf->thread = thread;
-    pthread_create(buf->thread, 0, (void* (*)(void*))thread_reader, argument);
+    pthread_create(&thread, 0, (void* (*)(void*))thread_reader2, argument);
+    pthread_detach(thread);
 }

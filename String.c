@@ -39,8 +39,7 @@ class(String, Object)
         $.length = strlen(c_str);
     }
     
-    virtual const char * method(c_str)()
-    {
+    method c_str() const char * {
         return $.c_str;
     }
 
@@ -50,16 +49,12 @@ class(String, Object)
         $.length = strlen(value);
     }
 
-    // TODO
-    /* virtual c_str() char * { */
-    /*     return $.c_str; */
-    /* } */
-
-    virtual char method(charAt)(int index)
-    {
+    method charAt(int index) char {
         if (index < 0 || index > (int)$.length)
             return '\0';
         else
             return $.c_str[index];
     }
+
+    abstract f() void;
 }

@@ -1,16 +1,29 @@
+/*
+ * Copyright (C) 2016  Bastien Penavayre
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #pragma once
 
-#define ___ADD_THIS_NEW(args...)                                        \
-    ({                                                                  \
-        NEW_TYPE() MACRO_GLUE(this__, __LINE__) =                       \
-            NEW_TYPE(__shallow_new)();                                  \
-        NEW_TOR((struct NEW_TYPE(__private) *)MACRO_GLUE(this__, __LINE__), ##args); \
-        MACRO_GLUE(this__, __LINE__);                                   \
-    })
+PROC(define ___ADD_ZERO(args...) (0, ##args))
+PROC(define MACRO_GLUE_3_elements(x, y, z) x ## y ## z)
 
-#define new(type, name)                                         \
-    UNDEF(NEW_TYPE)                                             \
-    UNDEF(NEW_TOR)                                              \
-    PROC(define NEW_TYPE(x) MACRO_GLUE_2_(type, x))             \
-    PROC(define NEW_TOR MACRO_GLUE_2_(type, __ctor_ ## name))   \
-    ___ADD_THIS_NEW
+#define new                                                             \
+    MACRO_GLUE_3_elements( __POSTFIX__(@B_SWALLOW ( @, ) @, )___ADD_ZERO  @, ,__ctor_, @)

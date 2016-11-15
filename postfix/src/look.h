@@ -24,6 +24,10 @@
 #define ACTION                                                          \
     void action(char *before)                                           \
     {                                                                   \
+        if ($.size == 0)                                                \
+            return ;                                                    \
+        $.index = ($.index < 0 ? 0 :                                    \
+                   ($.index > $.size ? $.size : $.index));              \
         if (type == COPY) {                                             \
             char *tmp = 0;                                              \
             asprintf(&tmp, "%s%.*s%s", (copy == 0 ? "" : copy),         \
@@ -44,41 +48,55 @@
     {                                                                   \
         char *str_index = index($.data + $.index, '"');                 \
                                                                         \
-        if (!in_str && str_index)                                       \
+        if ((in_str && !str_index) || (!in_str && str_index && str_index < found)) \
         {                                                               \
-            skip_index = str_index + 1;                                 \
-            in_str = true;                                              \
-        }                                                               \
-        else if (in_str)                                                \
-        {                                                               \
-            if (str_index == NULL)                                      \
+            char *begin_str = str_index;                                \
+            if (in_str || !(str_index = index(begin_str + 1, '"')))     \
             {                                                           \
                 $.index = $.size;                                       \
-                action(0);                                               \
-                continue;                                               \
+                action(0);                                              \
+                in_str = true;                                          \
+                continue ;                                              \
             }                                                           \
-            else                                                        \
+            else if (found > begin_str && found < str_index)            \
             {                                                           \
                 $.index = str_index - $.data + 1;                       \
-                skip_index = NULL;                                      \
-                action(0);                                               \
-                in_str = false;                                         \
-                continue;                                               \
+                continue ;                                              \
             }                                                           \
         }                                                               \
-        else                                                            \
-            skip_index = NULL;                                          \
+        else if (in_str && str_index)                                   \
+        {                                                               \
+            $.index = str_index - $.data + 1;                           \
+            action(0);                                                  \
+            in_str = false;                                             \
+            continue;                                                   \
+        }                                                               \
+    }
+
+
+#define NEW_READ                                \
+    if ($.index >= $.size || $.size == 0)       \
+    {                                           \
+        action(0);                              \
+        __read(this);                           \
+        continue;                               \
     }
 
 #define END_OK                                  \
     return copy;
 
-#define END_KO                                  \
-    {                                           \
-        if (copy && type == COPY)               \
-        {                                       \
-            write($.out, copy, strlen(copy));   \
-            free(copy);                         \
-        }                                       \
-        return 0;                               \
+#define END_KO                                          \
+    {                                                   \
+        if (copy && type == COPY)                       \
+        {                                               \
+            print_strs($.out, copy, NULL);              \
+            free(copy);                                 \
+        }                                               \
+        if ($.data)                                     \
+        {                                               \
+            print_strs($.out, $.data + $.index, NULL);  \
+            free($.data);                               \
+            $.data = NULL;                              \
+        }                                               \
+        return 0;                                       \
     }

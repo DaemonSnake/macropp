@@ -12,7 +12,7 @@ buffer new(int in, int out)
     $.in = in;
     $.out = out;
     $.stream_finished = false;
-    $.thread = NULL;
+    $.next = NULL;
     return this;
 }
 
@@ -28,7 +28,7 @@ buffer new_string(char *str, int out)
     $.in = -1;
     $.out = out;
     $.stream_finished = false;
-    $.thread = NULL;
+    $.next = NULL;
     return this;
 }
 
@@ -38,14 +38,22 @@ buffer new_transfer(buffer this, int new_in, int out)
 
     tmp->in = $.in;
     tmp->index = $.index;
-    tmp->thread = $.thread;
+    tmp->next = $.next;
     $.in = new_in;
     $.data = 0;
     $.size = 0;
     $.stream_finished = false;
     $.index = 0;
-    $.thread = 0;
+    $.next = tmp;
     return tmp;
+}
+
+void transfer_back(buffer this, buffer other)
+{
+    $.next = other->next;
+    close($.in);
+    $.in = other->in;
+    delete(other);
 }
 
 void delete(buffer this)
@@ -64,6 +72,15 @@ void proccess(buffer this)
 {
     if ($.size == 0)
         return ;
+    if ($.index >= $.size)
+    {
+        write($.out, $.data, $.size);
+        free($.data);
+        $.data = NULL;
+        $.index = 0;
+        $.size = 0;
+        return ;
+    }
     write($.out, $.data, $.index);
     memmove($.data, $.data + $.index, $.size - $.index);
     $.size -= $.index;
@@ -75,6 +92,14 @@ void discard(buffer this)
 {
     if ($.size == 0)
         return ;
+    if ($.index >= $.size)
+    {
+        free($.data);
+        $.data = NULL;
+        $.index = 0;
+        $.size = 0;
+        return ;
+    }
     memmove($.data, $.data + $.index, $.size - $.index);
     $.size -= $.index;
     $.data[$.size] = '\0';
@@ -87,24 +112,20 @@ void __read(buffer this)
 
     if ($.stream_finished)
         return ;
-    if ($.data == NULL)
+    if ($.data == NULL) {
         $.data = malloc(SIZE + 1);
+        bzero($.data, SIZE + 1);
+    }
     if ($.in == -1) {
         $.stream_finished = true;
         return ;
     }
-    if ((len = read($.in, $.data + $.index, SIZE - $.index)) <= 0) {
-        if ($.thread != NULL) {
-            close($.in);
-            pthread_join(*$.thread, (void **)&$.in);
-            free($.thread);
-            $.thread = NULL;
-        }
-        else {
-            $.stream_finished = true;
-            return ;
-        }
-    }
+
+    while ((len = read($.in, $.data + $.size, SIZE - $.size)) <= 0)
+        if ($.next != NULL)
+            transfer_back(this, $.next);
+        else
+            return (void)($.stream_finished = true);
     $.size += len;
-    $.data[$.size] = 0;
+    $.data[$.size] = '\0';
 }

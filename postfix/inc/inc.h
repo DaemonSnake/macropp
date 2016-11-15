@@ -31,7 +31,7 @@
 #define $ (*this)
 #define SIZE 2048
 #define FREE(front, args...) free_all(front, ##args, 0)
-#define RAII __attribute__((cleanup(raii_free)))
+#define RAII __attribute__((cleanup(free_ptr)))
 
 typedef enum { false = 0, true } bool;
 typedef enum { PROCCESS, COPY } action_type;
@@ -44,8 +44,7 @@ struct buffer
     int index;
     int in, out;
     bool stream_finished;
-    pthread_t *thread;
-    buffer *next; //TO IMPLEMENT
+    buffer next;
 };
 
 buffer new(int in, int out);
@@ -56,7 +55,8 @@ void proccess(buffer this);
 void discard(buffer this);
 void __read(buffer this);
 char *look_for(buffer this, char *motif, char *before, action_type type);
-char *balanced_look_for(buffer this, char motif, char cancel, char *before, action_type type);
+char *balanced_look_for(buffer this, char motif, char cancel,
+                        char *before, bool swallow, action_type type);
 void rec_postfix(buffer buf);
 int append_string(char **str, char *buf, int size);
 void update_index(buffer this, int index);
@@ -66,5 +66,10 @@ char *get_argument(char *arg_list, int index);
 void free_all(void *, ...);
 void raii_free(void *);
 buffer new_transfer(buffer this, int new_in, int out);
-void spawn_look(buffer buf, char *motif, char *before, char *after);
-void spawn_balenced_look(buffer buf, char in, char out, char *before, char *after);
+int string_index(char *motif, ...);
+int int_index(char *str, char car);
+char *replace_special_characters(char *str);
+void print_size(int fd, size_t i);
+void print_strs(int fd, ...);
+void spawn_command(buffer buf, void(*function)(buffer, char *), char *arg, int offset);
+void free_ptr(void *);

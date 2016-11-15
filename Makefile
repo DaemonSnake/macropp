@@ -19,8 +19,7 @@
 # THE SOFTWARE.
 
 %.o: %.c
-	cpp $< $(CFLAGS) | \
-	./postfix/postfix | cpp $(CFLAGS) | cpp $(CFLAGS) | \
+	cpp $< $(CFLAGS) | ./postfix/postfix | cpp $(CFLAGS) | cpp $(CFLAGS) | \
 	gcc -c -x c $(CFLAGS) -o $@ /dev/stdin;
 
 SRC = 	src/object.c	\
