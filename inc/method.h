@@ -43,8 +43,8 @@ PROC(define ___CALL_METHOD2(line, name, arg_list, ret, body...)        \
     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \
     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \
     ___CALL_METHOD2 (                                                   \
-                     __POSTFIX__(@ ) @, , @)                            \
-    __POSTFIX__(@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @)         \
+                     [@ ) @, , @]                            \
+    [@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @]         \
     __LINE__,
 
 /* ABSTRACT */
@@ -62,8 +62,8 @@ PROC(define ___CALL_ABSTRACT2(line, name, arg_list, ret)        \
     append_macro_dotcoma(METHODS_VTABLE, MACRO_GLUE(METHODS_VTABLE_TOOL__, __LINE__)) \
     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \
     ___CALL_ABSTRACT2 (                                                   \
-                     __POSTFIX__(@LOOK ; @, ) @)                        \
-    __POSTFIX__(@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @)         \
+                     [@LOOK ; @, ) @]                        \
+    [@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @]         \
     __LINE__,
 
 
@@ -88,7 +88,7 @@ PROC(define ___CALL_ABSTRACT2(line, name, arg_list, ret)        \
 /* #define override                                                         \ */
 /*     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \ */
 /*     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \ */
-/*     __POSTFIX__(@ ) @) ___CALL_OVERRIDE ( __LINE__, */
+/*     [@ ) @] ___CALL_OVERRIDE ( __LINE__, */
 
 /* '*TOR' */
 
@@ -106,7 +106,7 @@ PROC(define __OUT_CTOR__ \
     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \
     append_macro_nosep(METHODS_PROTO_CODE, MACRO_GLUE(METHODS_CODE_PROTO_TOOL__, __LINE__)) \
     ___CALL_TOR2 (                                                      \
-                  __POSTFIX__(@ __OUT_CTOR__) @, ,__IN_CTOR__ @)        \
+                  [@ __OUT_CTOR__) @, ,__IN_CTOR__ @]                   \
     __LINE__, ctor_ ## name, ___METHOD_ADD_THIS
 
 PROC(define ___CALL_TOR(line, name, arg_list, arg_list_p, body...) \

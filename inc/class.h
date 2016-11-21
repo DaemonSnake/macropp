@@ -31,7 +31,7 @@
     PROC(define CLASS(x) MACRO_GLUE_2_(name, x))                \
     PROC(define SUPER(x) MACRO_GLUE_2_(super, x))               \
                                                                 \
-    struct name ## __private_data __POSTFIX__(@ end_class @)
+    struct name ## __private_data [@ end_class @]
 
 #define end_class                                                       \
     ;                                                                   \

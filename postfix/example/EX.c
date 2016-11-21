@@ -1,13 +1,13 @@
 #define class(name, parent)                     \
     typedef struct name name;                   \
     _Pragma("")                                 \
-    struct name __POSTFIX__(@ end_class @)
+    struct name [@ end_class @]
 
 #define method                                  \
-    virtual(__POSTFIX__(@ ) @, , @)             \
-    __POSTFIX__(@BALENCED ( @, ) @, , @, , @)
+    virtual( [@ ) @, , @]             \
+    [@BALENCED ( @, ) @, , @, , @]
 
-char *tmp = "__POSTFIX__(@ YOLO @) {}";
+char *tmp = "[@ YOLO @] {}";
 
 class(String, Object)
 {
@@ -16,17 +16,17 @@ class(String, Object)
     }
 }
 
-'__POSTFIX__(@ @)\' __POSTFIX__(@ @)'
+'[@ @]\' [@ @]'
 
 int main()
 {
 }
 
-__POSTFIX__(@COUNTER VALUE @)
-__POSTFIX__(@COUNTER NEXT @)
-__POSTFIX__(@COUNTER PREV @)
-__POSTFIX__(@COUNTER VALUE @)
-__POSTFIX__(@COUNTER VALUE @, YOLO @)
-__POSTFIX__(@STRLEN "YOLO\n" @)
-__POSTFIX__(@STRLEN NULL @)
-__POSTFIX__(@FORMAT "\n#define % %\n" @, U bitch @, 42 @)
+[@COUNTER VALUE @]
+[@COUNTER NEXT @]
+[@COUNTER PREV @]
+[@COUNTER VALUE @]
+[@COUNTER VALUE @, YOLO @]
+[@STRLEN "YOLO\n" @]
+[@STRLEN NULL @]
+[@FORMAT "\n#define % %\n" @, U bitch @, 42 @]

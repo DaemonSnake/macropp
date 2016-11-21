@@ -6,7 +6,7 @@
         auto &&x = expr;                                                \
         for (auto it = x.begin(); it != x.end(); ++it)                  \
         {                                                               \
-            auto name = *it; __POSTFIX__(@ }} @)
+            auto name = *it; [@ }} @]
 
 int main()
 {
