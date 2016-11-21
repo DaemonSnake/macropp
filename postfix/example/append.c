@@ -26,3 +26,5 @@ alphabet
 APPEND(alphabet, ",", C)
 
 alphabet
+
+PROC(define YOLO 42)

@@ -5,14 +5,15 @@ char *look_for(buffer this, char *motif, char *before, action_type type)
 {
     int motif_len = strlen(motif);
     char *copy = 0, *found = 0;
-    bool in_str = false;
+    bool in_str = false, in_char = false;
 
     ACTION;
     while (!$.stream_finished)
     {
         NEW_READ;
         found = strstr($.data + $.index, motif);
-        HANDLE_STR;
+        HANDLE_STR(in_str, '"', found);
+        HANDLE_STR(in_char, '\'', found);
         if (found != NULL) {
             $.index = found - $.data;
             action(before);
@@ -30,9 +31,9 @@ char *look_for(buffer this, char *motif, char *before, action_type type)
 char *balanced_look_for(buffer this, char motif, char cancel, char *before,
                         bool swallow, action_type type)
 {
-    char *copy = 0, *found = 0;
+    char *copy = 0, *in = 0, *out = 0;
     int depth = 0;
-    bool started = false;
+    bool started = false, in_str = false, in_char = false;
 
     ACTION
     while (!$.stream_finished)
@@ -41,8 +42,12 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before,
         
         if (!started)
         {
-            if ((found = index($.data + $.index, motif))) {
-                $.index = found - $.data;
+            in = index($.data + $.index, motif);
+            HANDLE_STR(in_str, '"', in);
+            HANDLE_STR(in_char, '\'', in);
+            if (in)
+            {
+                $.index = in - $.data;
                 started = true;
                 action(before);
                 if (swallow) {
@@ -55,21 +60,30 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before,
                 $.index = $.size;
             continue;
         }
-        for (int i = $.index; i < $.size; i++)
-            if ($.data[i] == motif)
-                depth++;
-            else if ($.data[i] == cancel)
-                if (--depth == 0)
-                {
-                    $.index = i + (swallow ? 0 : 1);
-                    action(0);
-                    if (swallow) {
-                        $.index = i;
-                        discard(this);
-                    }
-                    END_OK;
-                }
-        $.index = $.size;
+
+        out = min_str(index_without_escape($.data + $.index, motif),
+                      index_without_escape($.data + $.index, cancel));
+        HANDLE_STR(in_str, '"', out);
+        HANDLE_STR(in_char, '\'', out);
+
+        if (!out)
+        {
+            $.index = $.size;
+            continue;
+        }
+        $.index = out - $.data + 1;
+        if (*out == cancel && --depth == 0)
+        {
+            $.index = out - $.data + (swallow ? 0 : 1);
+            action(0);
+            if (swallow) {
+                $.index = out - $.data;
+                discard(this);
+            }
+            END_OK;
+        }
+        else if (*out == motif)
+            depth++;
     }
     END_KO;
 }

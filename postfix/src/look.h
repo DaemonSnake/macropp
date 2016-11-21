@@ -44,32 +44,54 @@
         }                                                               \
     }
 
-#define HANDLE_STR                                                      \
+#define HANDLE_STR(IN_NAME, CH, FOUND)                                  \
     {                                                                   \
-        char *str_index = index($.data + $.index, '"');                 \
+        char *str_index = index_without_escape($.data + $.index, CH);   \
                                                                         \
-        if ((in_str && !str_index) || (!in_str && str_index && str_index < found)) \
+        if (IN_NAME)                                                    \
         {                                                               \
-            char *begin_str = str_index;                                \
-            if (in_str || !(str_index = index(begin_str + 1, '"')))     \
-            {                                                           \
-                $.index = $.size;                                       \
-                action(0);                                              \
-                in_str = true;                                          \
-                continue ;                                              \
-            }                                                           \
-            else if (found > begin_str && found < str_index)            \
+            if (str_index)                                              \
             {                                                           \
                 $.index = str_index - $.data + 1;                       \
+                IN_NAME = false;                                        \
+                continue ;                                              \
+            }                                                           \
+            else                                                        \
+            {                                                           \
+                $.index = $.size;                                       \
                 continue ;                                              \
             }                                                           \
         }                                                               \
-        else if (in_str && str_index)                                   \
+        else if (str_index)                                             \
         {                                                               \
-            $.index = str_index - $.data + 1;                           \
-            action(0);                                                  \
-            in_str = false;                                             \
-            continue;                                                   \
+            char *begin_str = str_index;                                \
+                                                                        \
+            str_index = index_without_escape(begin_str + 1, CH);        \
+            if (!FOUND)                                                 \
+            {                                                           \
+                if (str_index)                                          \
+                {                                                       \
+                    $.index = str_index - $.data + 1;                   \
+                    continue;                                           \
+                }                                                       \
+                IN_NAME = true;                                         \
+                $.index = $.size;                                       \
+                continue ;                                              \
+            }                                                           \
+            else if (begin_str < FOUND)                                 \
+            {                                                           \
+                if (!str_index)                                         \
+                {                                                       \
+                    IN_NAME = true;                                     \
+                    $.index = $.size;                                   \
+                    continue;                                           \
+                }                                                       \
+                else if (FOUND < str_index)                             \
+                {                                                       \
+                    $.index = str_index - $.data + 1;                   \
+                    continue ;                                          \
+                }                                                       \
+            }                                                           \
         }                                                               \
     }
 

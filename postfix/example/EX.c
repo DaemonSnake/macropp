@@ -1,5 +1,3 @@
-#define end_class ;
-
 #define class(name, parent)                     \
     typedef struct name name;                   \
     _Pragma("")                                 \
@@ -17,6 +15,8 @@ class(String, Object)
     {
     }
 }
+
+'__POSTFIX__(@ @)\' __POSTFIX__(@ @)'
 
 int main()
 {

@@ -38,7 +38,7 @@ int skip_separator(char *string)
     return 0;
 }
 
-static char *min_str(char *l, char *r) { return ((l < r && l != NULL) || (r == NULL) ? l : r); }
+char *min_str(char *l, char *r) { return ((l < r && l != NULL) || (r == NULL) ? l : r); }
 
 char *get_argument(char *arg_list, int index)
 {
@@ -131,4 +131,17 @@ void free_ptr(void *ptr)
         return ;
     free(*(void **)ptr);
     *(void **)ptr = NULL;
+}
+
+char *index_without_escape(char *str, char c)
+{
+    char *tmp = index(str, c);
+
+    while (tmp != NULL)
+    {
+        if (*(tmp - 1) != '\\')
+            return tmp;
+        tmp = index(tmp + 1, c);
+    }
+    return NULL;
 }
