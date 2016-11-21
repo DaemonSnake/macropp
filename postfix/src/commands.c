@@ -21,14 +21,16 @@
  */
 #include "inc.h"
 
-#define GET(i) get_argument(argument, i)
-#define NEW_HANDLE(name) void handle_ ## name(buffer buf, char *argument)
+#define GET(i) pop_argument(&args, i + 1)
+#define CLEAN() free_arguments(&args)
+#define NEW_HANDLE(name) void handle_ ## name(buffer buf, struct array args)
 
 NEW_HANDLE(default)
 {
     char *after RAII = GET(0),
         *before RAII = GET(1);
 
+    CLEAN();
     balanced_look_for(buf, '{', '}', before, false, PROCCESS);
     write(buf->out, after, strlen(after));
 }
@@ -38,7 +40,8 @@ NEW_HANDLE(look)
     char *motif RAII = GET(0),
         *after RAII = GET(1),
         *before RAII = GET(2);
-    
+
+    CLEAN();
     look_for(buf, motif, before, false, PROCCESS);
     write(buf->out, after, strlen(after));
 }
@@ -48,7 +51,8 @@ NEW_HANDLE(l_swallow)
     char *motif RAII = GET(0),
         *after RAII = GET(1),
         *before RAII = GET(2);
-    
+
+    CLEAN();
     look_for(buf, motif, before, true, PROCCESS);
     write(buf->out, after, strlen(after));
 }
@@ -61,6 +65,7 @@ NEW_HANDLE(balenced)
         *before RAII = GET(3),
         in, out;
 
+    CLEAN();
     if (in_tmp == NULL || out_tmp == NULL || after == NULL)
         return ;
     in = in_tmp[0];
@@ -77,6 +82,7 @@ NEW_HANDLE(b_swallow)
         *before RAII = GET(3),
         in, out;
 
+    CLEAN();
     if (in_tmp == NULL || out_tmp == NULL || after == NULL)
         return ;
     in = in_tmp[0];
@@ -88,10 +94,11 @@ NEW_HANDLE(b_swallow)
 NEW_HANDLE(counter)
 {
     static size_t i = 0;
-    char *to_mangle RAII = GET(1),
-        *type_str RAII = GET(0);
+    char *type_str RAII = GET(0),
+        *to_mangle RAII = GET(1);
     int type = string_index(type_str, "VALUE", "NEXT", "PREV", NULL);
 
+    CLEAN();
     if (type < 0)
         return ;
     if (to_mangle)
@@ -109,6 +116,7 @@ NEW_HANDLE(unstring)
     char *str RAII = GET(0);
     char *begin, *end;
 
+    CLEAN();
     if (str == NULL)
         return ;
     if ((begin = index(str, '"')) == NULL)
@@ -125,6 +133,7 @@ NEW_HANDLE(strlen)
     char *str RAII = replace_special_characters(GET(0));
     char *begin, *end;
 
+    CLEAN();
     if (str == NULL)
         return ;
     if ((begin = index(str, '"')) == NULL || (end = rindex(++begin, '"')) == NULL)
@@ -151,6 +160,7 @@ NEW_HANDLE(format)
         }
         it++;
     }
+    CLEAN();
 }
 
 #ifdef $
@@ -158,40 +168,35 @@ NEW_HANDLE(format)
 #endif
 #define $ handlers[i]
 
-void handle_arguments(buffer buf, char *argument)
+void handle_arguments(buffer buf)
 {
-    struct {
+    static const struct {
         char *motif;
         int size;
-        void (*handler)(buffer, char *);
-        bool reads_input;
+        void (*handler)(buffer, struct array);
     } handlers[] = {
-        {" ", 1, handle_default, true},
-        {"LOOK ", 5, handle_look, true},
-        {"LOOK_SW ", 8, handle_l_swallow, true},
-        {"BALENCED ", 9, handle_balenced, true},
-        {"BALENCED_SW ", 12, handle_b_swallow, true},
-        {"COUNTER ", 8, handle_counter, false},
-        {"UNSTRING ", 9, handle_unstring, false},
-        {"STRLEN ", 6, handle_strlen, false},
-        {"FORMAT ", 6, handle_format, false}
+        {"", 0, handle_default},
+        {"LOOK", 4, handle_look},
+        {"LOOK_SW", 7, handle_l_swallow},
+        {"BALENCED", 8, handle_balenced},
+        {"BALENCED_SW", 11, handle_b_swallow},
+        {"COUNTER", 7, handle_counter},
+        {"UNSTRING", 8, handle_unstring},
+        {"STRLEN", 5, handle_strlen},
+        {"FORMAT", 5, handle_format}
     };
-
+    struct array args = get_argument_list(buf);
+    char *arg = pop_argument(&args, 0);
     int size;
-    if (argument == NULL)
+    
+    if (args.data == NULL)
         return ;
-
-    size = strlen(argument);
+    size = strlen(arg);
     for (unsigned i = 0; i < (sizeof(handlers) / sizeof(handlers[0])); i++)
-        if (size >= $.size && strncmp(argument, $.motif, $.size) == 0)
+        if (size == 0 || (size >= $.size && $.size > 0 && strncmp(arg, $.motif, $.size) == 0))
         {
-            if ($.reads_input)
-                spawn_command(buf, $.handler, argument, $.size);
-            else
-            {
-                $.handler(buf, argument + $.size);
-                free(argument);
-            }
-            break;
+            free(arg);
+            spawn_command(buf, $.handler, args);
+            return ;
         }
 }

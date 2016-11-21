@@ -29,8 +29,10 @@ static char *copy_argument_list(buffer this)
 
     if (result == NULL)
         return NULL;
-    while ((found = strstr(result, "[@")) != NULL)
+    while ((found = strstr(found, "[@")) != NULL) {
         count++;
+        found += 2;
+    }
     while (count > 0)
     {
         found = look_for(this, " @]", NULL, true, COPY);
@@ -56,7 +58,7 @@ static char *get_end_of_argument(char *list, bool rec, char **end)
     enum { IN = 0, OUT = 1, SEP = 2 };
     char *result[3];
 
-    while (list &&
+    while (list && *list &&
            ((intptr_t)(result[IN] = strstr(list, motifs[IN])) +
             (intptr_t)(result[OUT] = strstr(list, motifs[OUT])) +
             (intptr_t)(result[SEP] = (!rec ? strstr(list, motifs[SEP]) : NULL))) != 0)
@@ -72,7 +74,9 @@ static char *get_end_of_argument(char *list, bool rec, char **end)
         }
         return result[min];
     }
-    return NULL;
+    if (end)
+        *end = list + strlen(list);
+    return (list + strlen(list));
 }
 
 struct array get_argument_list(buffer this)
@@ -80,20 +84,44 @@ struct array get_argument_list(buffer this)
     char *arg_list = copy_argument_list(this),
         *tmp = NULL, *begin = arg_list;
     char **result = NULL, *end = NULL;
-    int items = 0;
+    unsigned i = 0;
 
     if (!arg_list || !(tmp = index(arg_list, ' ')))
         goto end;
     result = calloc(sizeof(char *), 1);
-    result[items++] = strndup(arg_list, tmp - arg_list);
+    result[i++] = strndup(arg_list, tmp - arg_list);
     arg_list = tmp + 1;
     while ((tmp = get_end_of_argument(arg_list, false, &end)))
     {
-        result = realloc(result, (items + 1) * sizeof(char *));
-        result[items++] = strndup(arg_list, end - arg_list);
+        result = realloc(result, (i + 1) * sizeof(char *));
+        result[i++] = strndup(arg_list, end - arg_list);
+        if (!*tmp || !*end)
+            break;
         arg_list = tmp;
     }
  end:
     free(begin);
-    return (struct array){result, items};
+    return (struct array){result, i};
+}
+
+void free_arguments(struct array *arg)
+{
+    for (unsigned i = 0; i < arg->size; i++) {
+        if (!arg->data[i])
+            continue;
+        free(arg->data[i]);
+        arg->data[i] = NULL;
+    }
+    free(arg->data);
+    arg->data = NULL;
+    arg->size = 0;
+}
+
+char *pop_argument(struct array *arg, unsigned index)
+{
+    if (!arg || index >= arg->size)
+        return NULL;
+    char *tmp = arg->data[index];
+    arg->data[index] = NULL;
+    return tmp;
 }

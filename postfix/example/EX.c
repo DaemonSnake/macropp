@@ -30,3 +30,7 @@ int main()
 [@STRLEN "YOLO\n" @]
 [@STRLEN NULL @]
 [@FORMAT "\n#define % %\n" @, U bitch @, 42 @]
+
+[@ [@FORMAT "\n[@STRLEN \"42\" @]" @] @]
+{
+}

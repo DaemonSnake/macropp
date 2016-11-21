@@ -23,7 +23,7 @@ buffer new_string(char *str, int out)
     if (!this)
         return NULL;
     $.data = str;
-    $.size = strlen(str);
+    $.size = (str == NULL ? 0 : strlen(str));
     $.index = 0;
     $.in = -1;
     $.out = out;

@@ -25,31 +25,27 @@ typedef struct
 {
     int pipe[2];
     buffer buf;
-    void (*function)(buffer, char *);
-    char *argument;
-    int offset;
+    void (*function)(buffer, struct array);
+    struct array args;
 } data;
-
 
 static void *thread_reader2(data *this)
 {
-    $.function($.buf, $.argument + $.offset);
+    $.function($.buf, $.args);
     $.buf->index = $.buf->size;
     proccess($.buf);
     close($.pipe[1]);
-    FREE($.argument, this);
     return NULL;
 }
 
-void spawn_command(buffer buf, void(*function)(buffer, char *), char *arg, int offset)
+void spawn_command(buffer buf, void(*function)(buffer, struct array), struct array args)
 {
     data *argument = malloc(sizeof(data));
     pthread_t thread;
 
     pipe(argument->pipe);
     argument->function = function;
-    argument->argument = arg;
-    argument->offset = offset;
+    argument->args = args;
     argument->buf = new_transfer(buf, argument->pipe[0], argument->pipe[1]);
     pthread_create(&thread, 0, (void* (*)(void*))thread_reader2, argument);
     pthread_detach(thread);

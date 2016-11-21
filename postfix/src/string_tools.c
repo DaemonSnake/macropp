@@ -80,10 +80,10 @@ char *replace_special_characters(char *str)
     {
         if (*read == '\\' && read[1] != '\0')
         {
-            int i = int_index("abfnrtv", read[1]);
+            int i = int_index("abfnrtv'\"", read[1]);
             if (i == -1)
                 goto no_backslash;
-            *write = "\a\b\f\n\r\t\v"[i];
+            *write = "\a\b\f\n\r\t\v'\""[i];
             read++;
         }
         else if (read != write)
@@ -112,7 +112,6 @@ char *index_without_escape(char *str, char c)
 char *append_string_n(char *or, char *new_end, int size_end)
 {
     int size = (!or ? 0 : strlen(or));
-    char *end = (size > 0 ? or + size : NULL);
 
     if (!or && !new_end)
         return NULL;
@@ -121,8 +120,8 @@ char *append_string_n(char *or, char *new_end, int size_end)
     if (new_end == NULL)
         return or;
     or = realloc(or, size + size_end + 1);
-    memmove(end, new_end, size_end);
-    *(end + size_end) = '\0';
+    memmove(or + size, new_end, size_end);
+    *(or + size_end + size) = '\0';
     return or;
 }
 

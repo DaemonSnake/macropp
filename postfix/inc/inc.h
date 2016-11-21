@@ -50,7 +50,7 @@ struct buffer
 struct array
 {
     char **data;
-    int size;
+    unsigned size;
 };
 
 buffer new(int in, int out);
@@ -66,7 +66,7 @@ char *balanced_look_for(buffer this, char motif, char cancel,
 void rec_postfix(buffer buf);
 void update_index(buffer this, int index);
 int skip_separator(char *string);
-void handle_arguments(buffer buf, char *arguments);
+void handle_arguments(buffer buf);
 char *get_argument(char *arg_list, int index);
 void free_all(void *, ...);
 void raii_free(void *);
@@ -76,10 +76,12 @@ int int_index(char *str, char car);
 char *replace_special_characters(char *str);
 void print_size(int fd, size_t i);
 void print_strs(int fd, ...);
-void spawn_command(buffer buf, void(*function)(buffer, char *), char *arg, int offset);
+void spawn_command(buffer buf, void(*function)(buffer, struct array), struct array);
 void free_ptr(void *);
 char *index_without_escape(char *str, char c);
 char *min_str(char *, char *);
 char *append_string(char *or, char *new_end);
 char *append_string_n(char *or, char *new_end, int size_end);
 struct array get_argument_list(buffer this);
+void free_arguments(struct array *);
+char *pop_argument(struct array *arg, unsigned index);
