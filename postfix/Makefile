@@ -24,6 +24,7 @@ SRC =		src/main.c		\
 		src/buffer.c		\
 		src/string_tools.c	\
 		src/commands.c		\
+		src/arguments.c		\
 		src/thread.c
 
 OBJ =		$(SRC:.c=.o)

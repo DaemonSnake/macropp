@@ -12,3 +12,4 @@
      -> Balenced from char to string to handle correctly '(@' and '@)'
 
 ?? -find a way to save a macro
+?? -handle '\377' and 'xFF' for format

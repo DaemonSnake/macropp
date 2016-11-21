@@ -47,6 +47,12 @@ struct buffer
     buffer next;
 };
 
+struct array
+{
+    char **data;
+    int size;
+};
+
 buffer new(int in, int out);
 buffer new_string(char *str, int out);
 void delete(buffer this);
@@ -76,3 +82,4 @@ char *index_without_escape(char *str, char c);
 char *min_str(char *, char *);
 char *append_string(char *or, char *new_end);
 char *append_string_n(char *or, char *new_end, int size_end);
+struct array get_argument_list(buffer this);
