@@ -58,12 +58,12 @@ PROC(define ___CALL_ABSTRACT(line, name, arg_list, arg_list_p, ret)     \
 PROC(define ___CALL_ABSTRACT2(line, name, arg_list, ret)        \
      ___CALL_ABSTRACT(line, name, arg_list, ret))
 
-#define abstract                                                         \
+#define abstract                                                        \
     append_macro_dotcoma(METHODS_VTABLE, MACRO_GLUE(METHODS_VTABLE_TOOL__, __LINE__)) \
     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \
-    ___CALL_ABSTRACT2 (                                                   \
-                     [@LOOK ; @, ) @]                        \
-    [@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @]         \
+    ___CALL_ABSTRACT2 (                                                 \
+                       [@LOOK_SW ; @, ) @]                              \
+    [@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @]                    \
     __LINE__,
 
 

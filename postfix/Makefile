@@ -21,6 +21,7 @@
 SRC =		src/main.c		\
 		src/look.c		\
 		src/tools.c		\
+		src/buffer.c		\
 		src/string_tools.c	\
 		src/commands.c		\
 		src/thread.c

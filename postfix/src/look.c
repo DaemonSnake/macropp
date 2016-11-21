@@ -1,7 +1,7 @@
 #include "inc.h"
 #include "look.h"
 
-char *look_for(buffer this, char *motif, char *before, action_type type)
+char *look_for(buffer this, char *motif, char *before, bool swallow, action_type type)
 {
     int motif_len = strlen(motif);
     char *copy = 0, *found = 0;
@@ -18,7 +18,7 @@ char *look_for(buffer this, char *motif, char *before, action_type type)
             $.index = found - $.data;
             action(before);
             $.index = motif_len;
-            discard(this);
+            (swallow ? discard(this) : proccess(this));
             END_OK;
         }
         $.index = $.size - motif_len;

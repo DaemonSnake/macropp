@@ -48,17 +48,6 @@ char *get_argument(char *arg_list, int index)
     return strndup(arg_list, min_str(strstr(arg_list, " @, "), arg_list + strlen(arg_list)) - arg_list);
 }
 
-void free_all(void *front, ...)
-{
-    va_list ap;
-
-    free(front);
-    va_start(ap, front);
-    while ((front = va_arg(ap, void *)) != NULL)
-        free(front);
-    va_end(ap);
-}
-
 int string_index(char *motif, ...)
 {
     va_list ap;
@@ -105,38 +94,12 @@ char *replace_special_characters(char *str)
     return str;
 }
 
-void print_strs(int fd, ...)
-{
-    va_list ap;
-    char *str;
-
-    va_start(ap, fd);
-    while ((str = va_arg(ap, char *)) != NULL)
-        write(fd, str, strlen(str));
-    va_end(ap);
-}
-
-void print_size(int fd, size_t i)
-{
-    char *number;
-
-    asprintf(&number, "%lu", i);
-    write(fd, number, strlen(number));
-    free(number);
-}
-
-void free_ptr(void *ptr)
-{
-    if (!ptr || !(*(void **)ptr))
-        return ;
-    free(*(void **)ptr);
-    *(void **)ptr = NULL;
-}
-
 char *index_without_escape(char *str, char c)
 {
     char *tmp = index(str, c);
 
+    if (tmp == str)
+        return tmp;
     while (tmp != NULL)
     {
         if (*(tmp - 1) != '\\')
@@ -144,4 +107,26 @@ char *index_without_escape(char *str, char c)
         tmp = index(tmp + 1, c);
     }
     return NULL;
+}
+
+char *append_string_n(char *or, char *new_end, int size_end)
+{
+    int size = (!or ? 0 : strlen(or));
+    char *end = (size > 0 ? or + size : NULL);
+
+    if (!or && !new_end)
+        return NULL;
+    if (or == NULL)
+        return strndup(new_end, size_end);
+    if (new_end == NULL)
+        return or;
+    or = realloc(or, size + size_end + 1);
+    memmove(end, new_end, size_end);
+    *(end + size_end) = '\0';
+    return or;
+}
+
+char *append_string(char *or, char *new_end)
+{
+    return append_string_n(or, new_end, (!new_end ? 0 : strlen(new_end)));
 }

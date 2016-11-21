@@ -54,11 +54,10 @@ void exit_(buffer this);
 void proccess(buffer this);
 void discard(buffer this);
 void __read(buffer this);
-char *look_for(buffer this, char *motif, char *before, action_type type);
+char *look_for(buffer this, char *motif, char *before, bool swallow, action_type type);
 char *balanced_look_for(buffer this, char motif, char cancel,
                         char *before, bool swallow, action_type type);
 void rec_postfix(buffer buf);
-int append_string(char **str, char *buf, int size);
 void update_index(buffer this, int index);
 int skip_separator(char *string);
 void handle_arguments(buffer buf, char *arguments);
@@ -75,3 +74,5 @@ void spawn_command(buffer buf, void(*function)(buffer, char *), char *arg, int o
 void free_ptr(void *);
 char *index_without_escape(char *str, char c);
 char *min_str(char *, char *);
+char *append_string(char *or, char *new_end);
+char *append_string_n(char *or, char *new_end, int size_end);

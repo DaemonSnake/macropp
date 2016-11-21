@@ -26,4 +26,4 @@ PROC(define ___ADD_ZERO(args...) (0, ##args))
 PROC(define MACRO_GLUE_3_elements(x, y, z) x ## y ## z)
 
 #define new                                                             \
-    MACRO_GLUE_3_elements( [@B_SWALLOW ( @, ) @, )___ADD_ZERO  @, ,__ctor_, @]
+    MACRO_GLUE_3_elements( [@BALENCED_SW ( @, ) @, )___ADD_ZERO  @, ,__ctor_, @]

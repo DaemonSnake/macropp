@@ -29,11 +29,8 @@
         $.index = ($.index < 0 ? 0 :                                    \
                    ($.index > $.size ? $.size : $.index));              \
         if (type == COPY) {                                             \
-            char *tmp = 0;                                              \
-            asprintf(&tmp, "%s%.*s%s", (copy == 0 ? "" : copy),         \
-                     $.index, $.data, (before ? before : ""));          \
-            free(copy);                                                 \
-            copy = tmp;                                                 \
+            copy = append_string(append_string_n(copy, $.data, $.index), \
+                                 before);                               \
             discard(this);                                              \
         }                                                               \
         else if (type == PROCCESS) {                                    \

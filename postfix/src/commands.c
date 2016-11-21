@@ -39,7 +39,17 @@ NEW_HANDLE(look)
         *after RAII = GET(1),
         *before RAII = GET(2);
     
-    look_for(buf, motif, before, PROCCESS);
+    look_for(buf, motif, before, false, PROCCESS);
+    write(buf->out, after, strlen(after));
+}
+
+NEW_HANDLE(l_swallow)
+{
+    char *motif RAII = GET(0),
+        *after RAII = GET(1),
+        *before RAII = GET(2);
+    
+    look_for(buf, motif, before, true, PROCCESS);
     write(buf->out, after, strlen(after));
 }
 
@@ -158,8 +168,9 @@ void handle_arguments(buffer buf, char *argument)
     } handlers[] = {
         {" ", 1, handle_default, true},
         {"LOOK ", 5, handle_look, true},
+        {"LOOK_SW ", 8, handle_l_swallow, true},
         {"BALENCED ", 9, handle_balenced, true},
-        {"B_SWALLOW ", 10, handle_b_swallow, true},
+        {"BALENCED_SW ", 12, handle_b_swallow, true},
         {"COUNTER ", 8, handle_counter, false},
         {"UNSTRING ", 9, handle_unstring, false},
         {"STRLEN ", 6, handle_strlen, false},
