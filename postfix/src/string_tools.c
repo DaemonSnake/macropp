@@ -26,27 +26,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-int skip_separator(char *string)
-{
-    int size = (string ? strlen(string) : 0);
-
-    if (size <= 0)
-        return 0;
-    for (int i = 0; i < size; i++)
-        if (string[i] != ' ' && string[i] != '\t' && string[i] != '\n')
-            return i;
-    return 0;
-}
-
 char *min_str(char *l, char *r) { return ((l < r && l != NULL) || (r == NULL) ? l : r); }
-
-char *get_argument(char *arg_list, int index)
-{
-    for (int i = 0; arg_list > (char *)0x4 && i < index; arg_list = (i++, strstr(arg_list, " @, ") + 4));
-    if (arg_list <= (char *)0x4)
-        return NULL;
-    return strndup(arg_list, min_str(strstr(arg_list, " @, "), arg_list + strlen(arg_list)) - arg_list);
-}
 
 int string_index(char *motif, ...)
 {
@@ -128,4 +108,16 @@ char *append_string_n(char *or, char *new_end, int size_end)
 char *append_string(char *or, char *new_end)
 {
     return append_string_n(or, new_end, (!new_end ? 0 : strlen(new_end)));
+}
+
+size_t hash_string(char *_str)
+{
+    unsigned char *str = (unsigned char *)_str;
+    unsigned long hash = 5381;
+    int c;
+
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
 }

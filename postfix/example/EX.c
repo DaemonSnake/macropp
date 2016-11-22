@@ -34,3 +34,10 @@ int main()
 [@ [@FORMAT "\n" @] #define LOL [@FORMAT "\n" @] @]
 {
 }END
+
+[@MACRO CLASS @]
+[@MACRO CLASS @, String @]
+[@MACRO CLASS @]
+[@MACRO CLASS @, @]
+[@MACRO CLASS @, Hello @]
+[@MACRO CLASS @]

@@ -65,7 +65,6 @@ char *balanced_look_for(buffer this, char motif, char cancel,
                         char *before, bool swallow, action_type type);
 void rec_postfix(buffer buf);
 void update_index(buffer this, int index);
-int skip_separator(char *string);
 void handle_arguments(buffer buf);
 char *get_argument(char *arg_list, int index);
 void free_all(void *, ...);
@@ -85,3 +84,6 @@ char *append_string_n(char *or, char *new_end, int size_end);
 struct array get_argument_list(buffer this);
 void free_arguments(struct array *);
 char *pop_argument(struct array *arg, unsigned index);
+size_t hash_string(char *);
+void update_macro(char *, char *, bool);
+void expand_macro(buffer, char *);

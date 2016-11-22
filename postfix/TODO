@@ -1,17 +1,16 @@
--make __POSTFIX__(@ --- @) not match in look and balenced for '(' ')'
-
 -new instructions:
      -> @FUNCTION //@foreach, @args, @if, @else, @elseif etc...
      -> @CALL
-     -> @EVAL
-     -> @LIST
+     -> @EVAL //math
+     -> @LIST //push_back, front, pop_front, pop_back, etc...
 
 -make look behave as follows:
-     -> __POSTFIX__(@LOOK MOTIF @, AFTER @, BEFORE [@, ALT]* @)
+     -> [@LOOK MOTIF @, AFTER @, BEFORE [@, ALT]* @]
                           where ALT is an alternative before reading
      -> Balenced from char to string to handle correctly '(@' and '@)'
 
 -Memory leak from outer space.... (get_argument_list)
+-Handle empty arguments : [@SMTHG @, @, @]
 
 ?? -find a way to save a macro
 ?? -handle '\377' and 'xFF' for format
