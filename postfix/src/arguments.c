@@ -21,27 +21,28 @@
  */
 #include "inc.h"
 
-static char *copy_argument_list(buffer this)
+static int count_substr(char *haystack, char *needle)
 {
-    char *result = look_for(this, " @]", NULL, true, COPY);
-    char *found = result;
     int count = 0;
 
-    if (result == NULL)
-        return NULL;
-    while ((found = strstr(found, "[@")) != NULL) {
+    while ((haystack = strstr(haystack, needle))) {
         count++;
-        found += 2;
+        haystack++;
     }
-    while (count > 0)
-    {
-        found = look_for(this, " @]", NULL, true, COPY);
-        if (!found)
-            return result;
-        result = append_string_n(result, " @]", 3);
-        result = append_string(result, found);
-        count--;
-    }
+    return count;
+}
+
+static bool argument_list_is_ok(char *result)
+{
+    return (count_substr(result, "[@") + 1) == count_substr(result, " @]");
+}
+
+static char *copy_argument_list(buffer this)
+{
+    char *result = look_for(this, " @]", NULL, false, COPY);
+    
+    while (!argument_list_is_ok(result))
+        result = append_string(result, look_for(this, " @]", NULL, false, COPY));
     return result;
 }
 
@@ -52,6 +53,8 @@ static int min_str_3(char *_0, char *_1, char *_2)
             (min_str(_1, _2) == _1 ? 1 : 2));
 }
 
+static int str_to_int(char *str) { return str == NULL ? 0 : 1; }
+
 static char *get_end_of_argument(char *list, bool rec, char **end)
 {
     char *motifs[3] = {"[@", " @]", " @, "};
@@ -59,19 +62,20 @@ static char *get_end_of_argument(char *list, bool rec, char **end)
     char *result[3];
 
     while (list && *list &&
-           ((intptr_t)(result[IN] = strstr(list, motifs[IN])) +
-            (intptr_t)(result[OUT] = strstr(list, motifs[OUT])) +
-            (intptr_t)(result[SEP] = (!rec ? strstr(list, motifs[SEP]) : NULL))) != 0)
+           (str_to_int(result[IN] = strstr(list, motifs[IN])) +
+            str_to_int(result[OUT] = strstr(list, motifs[OUT])) +
+            str_to_int(result[SEP] = (!rec ? strstr(list, motifs[SEP]) : NULL))) > 0)
     {
         int min = min_str_3(result[IN], result[OUT], result[SEP]);
-        if (end)
-            *end = result[min];
-        result[min] += strlen(motifs[min]);
+        int size = strlen(motifs[min]);
+        result[min] += size;
         if (min == IN)
         {
             list = get_end_of_argument(result[min], true, NULL);
             continue ;
         }
+        if (end)
+            *end = result[min] - size;
         return result[min];
     }
     if (end)

@@ -17,8 +17,8 @@ char *look_for(buffer this, char *motif, char *before, bool swallow, action_type
         if (found != NULL) {
             $.index = found - $.data;
             action(before);
-            $.index = motif_len;
-            (swallow ? discard(this) : proccess(this));
+            $.index += motif_len;
+            (swallow ? discard(this) : action(0));
             END_OK;
         }
         $.index = $.size - motif_len;

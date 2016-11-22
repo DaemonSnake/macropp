@@ -43,8 +43,8 @@ PROC(define ___CALL_METHOD2(line, name, arg_list, ret, body...)        \
     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \
     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \
     ___CALL_METHOD2 (                                                   \
-                     [@ ) @, , @]                            \
-    [@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @]         \
+                     [@ ) @, , @]                                       \
+    [@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @]                    \
     __LINE__,
 
 /* ABSTRACT */
@@ -76,20 +76,7 @@ PROC(define ___CALL_ABSTRACT2(line, name, arg_list, ret)        \
     method set_ ## name(typeof(((struct CLASS(__private) *)0)->name) value) void
 
 //TODO: axM
-
 /* OVERRIDE */
-
-/* PROC(define ___CALL_OVERRIDE(line, ret, name, arg_list, arg_list_p, body...) \ */
-/*      PROC_2(define MACRO_GLUE_2_(METHODS_NAME_TOOL__, line)             \ */
-/*             . name = (ret (*) arg_list)&CLASS(__ ## name)) _PRAGMA(_)   \ */
-/*      PROC_2(define MACRO_GLUE_2_(METHODS_CODE_TOOL__, line)             \ */
-/*             ret CLASS(__ ## name) arg_list_p body) _PRAGMA(_)) */
-
-/* #define override                                                         \ */
-/*     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \ */
-/*     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \ */
-/*     [@ ) @] ___CALL_OVERRIDE ( __LINE__, */
-
 /* '*TOR' */
 
 PROC(define __IN_CTOR__                                                 \

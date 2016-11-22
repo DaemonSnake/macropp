@@ -31,6 +31,6 @@ int main()
 [@STRLEN NULL @]
 [@FORMAT "\n#define % %\n" @, U bitch @, 42 @]
 
-[@ [@FORMAT "\n[@STRLEN \"42\" @]" @] @]
+[@ [@FORMAT "\n" @] #define LOL [@FORMAT "\n" @] @]
 {
-}
+}END

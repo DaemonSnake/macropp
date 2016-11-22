@@ -175,11 +175,10 @@ void handle_arguments(buffer buf)
         int size;
         void (*handler)(buffer, struct array);
     } handlers[] = {
-        {"", 0, handle_default},
-        {"LOOK", 4, handle_look},
         {"LOOK_SW", 7, handle_l_swallow},
-        {"BALENCED", 8, handle_balenced},
+        {"LOOK", 4, handle_look},
         {"BALENCED_SW", 11, handle_b_swallow},
+        {"BALENCED", 8, handle_balenced},
         {"COUNTER", 7, handle_counter},
         {"UNSTRING", 8, handle_unstring},
         {"STRLEN", 5, handle_strlen},
@@ -192,8 +191,10 @@ void handle_arguments(buffer buf)
     if (args.data == NULL)
         return ;
     size = strlen(arg);
+    if (size == 0)
+        spawn_command(buf, handle_default, args); 
     for (unsigned i = 0; i < (sizeof(handlers) / sizeof(handlers[0])); i++)
-        if (size == 0 || (size >= $.size && $.size > 0 && strncmp(arg, $.motif, $.size) == 0))
+        if (size >= $.size && strncmp(arg, $.motif, $.size) == 0)
         {
             free(arg);
             spawn_command(buf, $.handler, args);
