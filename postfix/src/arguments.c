@@ -20,29 +20,57 @@
  * THE SOFTWARE.
  */
 #include "inc.h"
+#define IN_STR "[@"
+#define OUT_STR " @]"
+#define SEP_STR " @, "
+
+#define IN_STR_SIZE 2
+#define OUT_STR_SIZE 3
+#define SEP_STR_SIZE 4
 
 static int count_substr(char *haystack, char *needle)
 {
     int count = 0;
+    char *str_begin = index(haystack, '"'), *char_begin = index(haystack, '\'');
+    char *tmp = NULL;
 
-    while ((haystack = strstr(haystack, needle))) {
-        count++;
-        haystack++;
+    while ((tmp = strstr(haystack, needle)))
+    {
+        if ((!str_begin || tmp < str_begin) &&
+            (!char_begin || tmp < char_begin))
+        {
+            count++;
+            haystack = tmp + 1;
+        }
+        else if (tmp > str_begin && (!char_begin || str_begin < char_begin)) {
+            haystack = index(str_begin + 1, '"');
+            str_begin = index(haystack + 1, '"');
+        }
+        else {
+            haystack = index(char_begin + 1, '\'');
+            char_begin = index(haystack + 1, '\'');
+        }
     }
     return count;
 }
 
 static bool argument_list_is_ok(char *result)
 {
-    return (count_substr(result, "[@") + 1) == count_substr(result, " @]");
+    if (!result)
+        return true;
+    return (count_substr(result, IN_STR) + 1) == count_substr(result, OUT_STR);
 }
 
 static char *copy_argument_list(buffer this)
 {
-    char *result = look_for(this, " @]", NULL, false, COPY);
+    char *result = look_for(this, OUT_STR, NULL, false, COPY);
     
-    while (!argument_list_is_ok(result))
-        result = append_string(result, look_for(this, " @]", NULL, false, COPY));
+    while (!argument_list_is_ok(result)) {
+        char *tmp = look_for(this, OUT_STR, NULL, false, COPY);
+        if (!tmp)
+            break ;
+        result = append_string(result, tmp);
+    }
     return result;
 }
 
@@ -53,20 +81,38 @@ static int min_str_3(char *_0, char *_1, char *_2)
             (min_str(_1, _2) == _1 ? 1 : 2));
 }
 
-static int str_to_int(char *str) { return str == NULL ? 0 : 1; }
-
 static char *get_end_of_argument(char *list, bool rec, char **end)
 {
-    char *motifs[3] = {"[@", " @]", " @, "};
+    char *motifs[3] = {IN_STR, OUT_STR, SEP_STR};
     enum { IN = 0, OUT = 1, SEP = 2 };
     char *result[3];
+    char *char_begin = NULL, *str_begin = NULL;
 
-    while (list && *list &&
-           (str_to_int(result[IN] = strstr(list, motifs[IN])) +
-            str_to_int(result[OUT] = strstr(list, motifs[OUT])) +
-            str_to_int(result[SEP] = (!rec ? strstr(list, motifs[SEP]) : NULL))) > 0)
+    while (list && *list)
     {
+        result[IN] = strstr(list, motifs[IN]);
+        result[OUT] = strstr(list, motifs[OUT]);
+        result[SEP] = (!rec ? strstr(list, motifs[SEP]) : NULL);
+        
+        if (!result[IN] && !result[OUT] && !result[SEP])
+            break ;
+        
+        char_begin = index(list, '\''); //without escape
+        str_begin = index(list, '"'); //without escape
         int min = min_str_3(result[IN], result[OUT], result[SEP]);
+
+        if ((char_begin && result[min] > char_begin) ||
+            (str_begin && result[min] > str_begin))
+        {
+            bool is_char = char_begin && (!str_begin || (str_begin && char_begin < str_begin));
+            char *tmp = index((is_char ? char_begin : str_begin) + 1,
+                              (is_char ? '\'' : '"'));
+            if (!tmp)
+                break ;
+            list = tmp + 1;
+            continue ;
+        }
+        
         int size = strlen(motifs[min]);
         result[min] += size;
         if (min == IN)
@@ -83,6 +129,48 @@ static char *get_end_of_argument(char *list, bool rec, char **end)
     return (list + strlen(list));
 }
 
+static char *dup_argument(char *arg, size_t size)
+{
+    char *res = NULL;;
+    const char *to_rep[] = {"%CLOSE", "%SEP", "%OPEN", "%NL"};
+    const int to_rep_size[] = {6, 4, 5, 3};
+    const char *with[] = {OUT_STR, SEP_STR, IN_STR, "\n"};
+    const int with_size[] = {OUT_STR_SIZE, SEP_STR_SIZE, IN_STR_SIZE, 1};
+    char *found[] = {NULL, NULL, NULL, NULL};
+    unsigned min = 0;
+    char tmp[size + 1];
+
+    strncpy(tmp, arg, size);
+    tmp[size] = '\0';
+    arg = tmp;
+    for (unsigned i = 0; i < sizeof(to_rep) / sizeof(to_rep[0]); i++)
+        found[i] = strstr(arg, to_rep[i]);
+    while (*arg)
+    {
+        min = 0;
+        for (unsigned i = 1; i < sizeof(to_rep) / sizeof(to_rep[0]); i++)
+            min = (min_str(found[min], found[i]) == found[i] ? i : min);
+        if (found[min] == NULL)
+            break ;
+        res = append_string_n(res, arg, found[min] - arg);
+        res = append_string_n(res, (char *)with[min], with_size[min]);
+        arg = found[min] + to_rep_size[min];
+        for (unsigned i = 0; i < sizeof(to_rep) / sizeof(to_rep[0]); i++)
+            if (found[i] && found[i] < arg)
+                found[i] = strstr(arg, to_rep[i]);
+    }
+    return (*arg ? append_string(res, arg) : res);
+}
+
+/* void dump_args(char **result, unsigned size) */
+/* { */
+/*     printf("\n[ARGS:\n"); */
+/*     for (unsigned i = 0; i < size; i++) */
+/*         printf("\t%d: '%s'\n", i, result[i]); */
+/*     printf("]\n"); */
+/*     fflush(stdout); */
+/* } */
+
 struct array get_argument_list(buffer this)
 {
     char *arg_list = copy_argument_list(this),
@@ -98,7 +186,7 @@ struct array get_argument_list(buffer this)
     while ((tmp = get_end_of_argument(arg_list, false, &end)))
     {
         result = realloc(result, (i + 1) * sizeof(char *));
-        result[i++] = strndup(arg_list, end - arg_list);
+        result[i++] = dup_argument(arg_list, end - arg_list);
         if (!*tmp || !*end)
             break;
         arg_list = tmp;

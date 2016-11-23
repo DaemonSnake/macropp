@@ -1,26 +1,16 @@
 #define class(name, parent)                     \
     typedef struct name name;                   \
-    _Pragma("")                                 \
+    [@MACRO CLASS @, name @]                    \
+    [@MACRO SUPER @, parent @]                  \
     struct name [@ end_class @]
 
 #define method                                  \
-    virtual( [@ ) @, , @]             \
-    [@BALENCED ( @, ) @, , @, , @]
+    [@ %CLOSE @]                                \
+    [@MACRO METHOD @,
 
 char *tmp = "[@ YOLO @] {}";
 
-class(String, Object)
-{
-    method func() void
-    {
-    }
-}
-
 '[@ @]\' [@ @]'
-
-int main()
-{
-}
 
 [@COUNTER VALUE @]
 [@COUNTER NEXT @]
@@ -31,13 +21,28 @@ int main()
 [@STRLEN NULL @]
 [@FORMAT "\n#define % %\n" @, U bitch @, 42 @]
 
-[@ [@FORMAT "\n" @] #define LOL [@FORMAT "\n" @] @]
+//Nested test
+[@ %NL #define LOL %NL @]
 {
 }END
+
+//Macro test
 
 [@MACRO CLASS @]
 [@MACRO CLASS @, String @]
 [@MACRO CLASS @]
 [@MACRO CLASS @, @]
+[@MACRO CLASS @]
 [@MACRO CLASS @, Hello @]
+[@MACRO CLASS @]
+
+//class tests
+class(String, Object)
+{
+    method func() void
+    {
+    }
+}
+
+[@MACRO METHOD @]
 [@MACRO CLASS @]

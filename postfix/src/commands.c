@@ -111,23 +111,6 @@ NEW_HANDLE(counter)
         print_size(buf->out, (i == 0 ? i : i - 1));
 }
 
-NEW_HANDLE(unstring)
-{
-    char *str RAII = GET(0);
-    char *begin, *end;
-
-    CLEAN();
-    if (str == NULL)
-        return ;
-    if ((begin = index(str, '"')) == NULL)
-        return ;
-    if ((end = rindex(begin + 1, '"')) == NULL)
-        return ;
-    if (begin + 1 == str)
-        return ;
-    write(buf->out, begin + 1, end - (begin + 1));
-}
-
 NEW_HANDLE(strlen)
 {
     char *str RAII = replace_special_characters(GET(0));
@@ -163,6 +146,32 @@ NEW_HANDLE(format)
     CLEAN();
 }
 
+NEW_HANDLE(macro)
+{
+    char *name RAII = GET(0),
+        *value RAII = GET(1);
+
+    CLEAN();
+    if (!is_identifier(name))
+        return ;
+    if (value)
+        update_macro(name, value, false);
+    else
+        expand_macro(buf, name);
+}
+
+NEW_HANDLE(macro_eval)
+{
+    char *name RAII = GET(0),
+        *value RAII = GET(1);
+
+    CLEAN();
+    if (!is_identifier(name))
+        return ;
+    (void)buf;
+    update_macro(name, value, true);
+}
+
 #ifdef $
 #undef $
 #endif
@@ -174,15 +183,17 @@ void handle_arguments(buffer buf)
         char *motif;
         int size;
         void (*handler)(buffer, struct array);
+        bool allow_spawn;
     } handlers[] = {
-        {"LOOK_SW", 7, handle_l_swallow},
-        {"LOOK", 4, handle_look},
-        {"BALENCED_SW", 11, handle_b_swallow},
-        {"BALENCED", 8, handle_balenced},
-        {"COUNTER", 7, handle_counter},
-        {"UNSTRING", 8, handle_unstring},
-        {"STRLEN", 5, handle_strlen},
-        {"FORMAT", 5, handle_format}
+        {"LOOK_SW", 7, handle_l_swallow, true},
+        {"LOOK", 4, handle_look, true},
+        {"BALENCED_SW", 11, handle_b_swallow, true},
+        {"BALENCED", 8, handle_balenced, true},
+        {"COUNTER", 7, handle_counter, false},
+        {"STRLEN", 6, handle_strlen, false},
+        {"FORMAT", 6, handle_format, true},
+        {"MACRO_EVAL", 10, handle_macro_eval, false},
+        {"MACRO", 5, handle_macro, false}
     };
     struct array args = get_argument_list(buf);
     char *arg = pop_argument(&args, 0);
@@ -192,12 +203,19 @@ void handle_arguments(buffer buf)
         return ;
     size = strlen(arg);
     if (size == 0)
-        spawn_command(buf, handle_default, args); 
+    {
+        spawn_command(buf, handle_default, args);
+        return ;
+    }
     for (unsigned i = 0; i < (sizeof(handlers) / sizeof(handlers[0])); i++)
         if (size >= $.size && strncmp(arg, $.motif, $.size) == 0)
         {
             free(arg);
-            spawn_command(buf, $.handler, args);
+            if ($.allow_spawn)
+                spawn_command(buf, $.handler, args);
+            else
+                $.handler(buf, args);
             return ;
         }
+    free_arguments(&args);
 }

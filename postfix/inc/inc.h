@@ -87,3 +87,4 @@ char *pop_argument(struct array *arg, unsigned index);
 size_t hash_string(char *);
 void update_macro(char *, char *, bool);
 void expand_macro(buffer, char *);
+bool is_identifier(char *str);

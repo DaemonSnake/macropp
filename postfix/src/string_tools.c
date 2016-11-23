@@ -25,6 +25,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <unistd.h>
+typedef enum {
+    false = 0,
+    true
+} bool;
 
 char *min_str(char *l, char *r) { return ((l < r && l != NULL) || (r == NULL) ? l : r); }
 
@@ -93,6 +97,8 @@ char *append_string_n(char *or, char *new_end, int size_end)
 {
     int size = (!or ? 0 : strlen(or));
 
+    if (size_end <= 0)
+        return or;
     if (!or && !new_end)
         return NULL;
     if (or == NULL)
@@ -120,4 +126,17 @@ size_t hash_string(char *_str)
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
     return hash;
+}
+
+bool is_identifier(char *str)
+{
+    if (!str || !*str)
+        return false;
+    if (!index("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_", *str))
+        return false;
+    str++;
+    for (; *str; str++)
+        if (!index("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", *str))
+            return false;
+    return true;
 }

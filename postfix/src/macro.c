@@ -114,6 +114,3 @@ void update_macro(char *name, char *value, bool eval)
         it->size = strlen(value);
     }
 }
-
-//[@MACRO NAME (@, VALUE)? @]
-//[@MACRO_EVAL NAME @, VALUE @]

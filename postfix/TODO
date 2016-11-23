@@ -10,7 +10,9 @@
      -> Balenced from char to string to handle correctly '(@' and '@)'
 
 -Memory leak from outer space.... (get_argument_list)
--Handle empty arguments : [@SMTHG @, @, @]
+-macro name should allow string as names
+-Transfer buffer back once finished instead of writing it all (look.c)
 
 ?? -find a way to save a macro
 ?? -handle '\377' and 'xFF' for format
+?? -Difference between unstring & format ???
