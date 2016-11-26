@@ -31,9 +31,11 @@
 static int count_substr(char *haystack, char *needle)
 {
     int count = 0;
-    char *str_begin = index(haystack, '"'), *char_begin = index(haystack, '\'');
+    char *str_begin = NULL, *char_begin = NULL;
     char *tmp = NULL;
 
+    str_begin = index(haystack, '"');
+    char_begin = index(haystack, '\'');
     while ((tmp = strstr(haystack, needle)))
     {
         if ((!str_begin || tmp < str_begin) &&
@@ -42,14 +44,13 @@ static int count_substr(char *haystack, char *needle)
             count++;
             haystack = tmp + 1;
         }
-        else if (tmp > str_begin && (!char_begin || str_begin < char_begin)) {
-            haystack = index(str_begin + 1, '"');
-            str_begin = index(haystack + 1, '"');
-        }
-        else {
-            haystack = index(char_begin + 1, '\'');
-            char_begin = index(haystack + 1, '\'');
-        }
+        else
+            haystack = min_str(str_begin, char_begin) + 1;
+
+        if (str_begin && str_begin < haystack)
+            str_begin = index(haystack, '"');
+        if (char_begin && char_begin < haystack)
+            char_begin = index(haystack, '\'');
     }
     return count;
 }
