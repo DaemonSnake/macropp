@@ -88,3 +88,4 @@ size_t hash_string(char *);
 void update_macro(char *, char *, bool);
 void expand_macro(buffer, char *);
 bool is_identifier(char *str);
+void unchar_string(char *str);

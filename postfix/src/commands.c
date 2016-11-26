@@ -66,6 +66,8 @@ NEW_HANDLE(balenced)
         in, out;
 
     CLEAN();
+    unchar_string(in_tmp);
+    unchar_string(out_tmp);
     if (in_tmp == NULL || out_tmp == NULL || after == NULL)
         return ;
     in = in_tmp[0];

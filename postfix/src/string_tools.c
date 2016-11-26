@@ -140,3 +140,19 @@ bool is_identifier(char *str)
             return false;
     return true;
 }
+
+void unchar_string(char *str)
+{
+    char *tmp = str;
+    char *begin;
+
+    if (!tmp)
+        return ;
+    for (; *tmp && (*tmp == ' ' || *tmp == '\t' || *tmp == '\n'); tmp++);
+    if (*tmp != '\'')
+        return ;
+    begin = ++tmp;
+    for (; *tmp && *tmp != '\''; tmp++);
+    *tmp = '\0';
+    memmove(str, begin, tmp - begin);
+}
