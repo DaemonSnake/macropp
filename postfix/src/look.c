@@ -61,8 +61,8 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before,
             continue;
         }
 
-        out = min_str(index_without_escape($.data + $.index, motif),
-                      index_without_escape($.data + $.index, cancel));
+        out = min_str(index($.data + $.index, motif),
+                      index($.data + $.index, cancel));
         HANDLE_STR(in_str, '"', out);
         HANDLE_STR(in_char, '\'', out);
 
