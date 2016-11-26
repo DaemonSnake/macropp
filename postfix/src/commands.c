@@ -23,7 +23,7 @@
 
 #define GET(i) pop_argument(&args, i + 1)
 #define CLEAN() free_arguments(&args)
-#define NEW_HANDLE(name) void handle_ ## name(buffer buf, struct array args)
+#define NEW_HANDLE(name) bool handle_ ## name(buffer buf, struct array args)
 
 struct handler_s {
     char *motif;
@@ -40,8 +40,10 @@ NEW_HANDLE(default)
         *before RAII = GET(1);
 
     CLEAN();
-    balanced_look_for(buf, '{', '}', before, false, PROCCESS);
+    if (!balanced_look_for(buf, '{', '}', before, false, PROCCESS))
+        return false;
     write(buf->out, after, strlen(after));
+    return true;
 }
 
 NEW_HANDLE(look)
@@ -51,8 +53,10 @@ NEW_HANDLE(look)
         *before RAII = GET(2);
 
     CLEAN();
-    look_for(buf, motif, before, false, PROCCESS);
+    if (!look_for(buf, motif, before, false, PROCCESS))
+        return false;
     write(buf->out, after, strlen(after));
+    return true;
 }
 
 NEW_HANDLE(l_swallow)
@@ -62,8 +66,10 @@ NEW_HANDLE(l_swallow)
         *before RAII = GET(2);
 
     CLEAN();
-    look_for(buf, motif, before, true, PROCCESS);
+    if (!look_for(buf, motif, before, true, PROCCESS))
+        return false;
     write(buf->out, after, strlen(after));
+    return true;
 }
 
 NEW_HANDLE(balenced)
@@ -78,11 +84,13 @@ NEW_HANDLE(balenced)
     unchar_string(in_tmp);
     unchar_string(out_tmp);
     if (in_tmp == NULL || out_tmp == NULL || after == NULL)
-        return ;
+        return false;
     in = in_tmp[0];
     out = out_tmp[0];
-    balanced_look_for(buf, in, out, before, false, PROCCESS);
+    if (!balanced_look_for(buf, in, out, before, false, PROCCESS))
+        return false;
     write(buf->out, after, strlen(after));
+    return true;
 }
 
 NEW_HANDLE(b_swallow)
@@ -97,11 +105,13 @@ NEW_HANDLE(b_swallow)
     unchar_string(in_tmp);
     unchar_string(out_tmp);
     if (in_tmp == NULL || out_tmp == NULL || after == NULL)
-        return ;
+        return false;
     in = in_tmp[0];
     out = out_tmp[0];
-    balanced_look_for(buf, in, out, before, true, PROCCESS);
+    if (!balanced_look_for(buf, in, out, before, true, PROCCESS))
+        return false;
     write(buf->out, after, strlen(after));
+    return true;
 }
 
 NEW_HANDLE(counter)
@@ -113,7 +123,7 @@ NEW_HANDLE(counter)
 
     CLEAN();
     if (type < 0)
-        return ;
+        return false;
     if (to_mangle)
         print_strs(buf->out, to_mangle, "__", NULL);
     if (type == 0)
@@ -122,6 +132,7 @@ NEW_HANDLE(counter)
         print_size(buf->out, ++i);
     else
         print_size(buf->out, (i == 0 ? i : i - 1));
+    return true;
 }
 
 NEW_HANDLE(strlen)
@@ -131,10 +142,11 @@ NEW_HANDLE(strlen)
 
     CLEAN();
     if (str == NULL)
-        return ;
+        return false;
     if ((begin = index(str, '"')) == NULL || (end = rindex(++begin, '"')) == NULL)
-        return (void)print_size(buf->out, 0);
+        return (print_size(buf->out, 0), false);
     print_size(buf->out, end - begin);
+    return true;
 }
 
 NEW_HANDLE(format)
@@ -157,6 +169,7 @@ NEW_HANDLE(format)
         it++;
     }
     CLEAN();
+    return true;
 }
 
 NEW_HANDLE(macro)
@@ -166,11 +179,12 @@ NEW_HANDLE(macro)
 
     CLEAN();
     if (!is_identifier(name))
-        return ;
+        return false;
     if (value)
         update_macro(name, value, false);
     else
         expand_macro(buf, name);
+    return true;
 }
 
 NEW_HANDLE(macro_eval)
@@ -180,9 +194,10 @@ NEW_HANDLE(macro_eval)
 
     CLEAN();
     if (!is_identifier(name))
-        return ;
+        return false;
     (void)buf;
     update_macro(name, value, true);
+    return true;
 }
 
 static const struct handler_s handlers[] = {

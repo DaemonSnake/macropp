@@ -25,7 +25,7 @@ typedef struct
 {
     int pipe[2];
     buffer buf;
-    void (*function)(buffer, struct array);
+    bool (*function)(buffer, struct array);
     struct array args;
 } data;
 
@@ -38,7 +38,7 @@ static void *thread_reader2(data *this)
     return NULL;
 }
 
-void spawn_command(buffer buf, void(*function)(buffer, struct array), struct array args)
+void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct array args)
 {
     data *argument = malloc(sizeof(data));
     pthread_t thread;
