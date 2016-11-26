@@ -75,7 +75,7 @@ int int_index(char *str, char car);
 char *replace_special_characters(char *str);
 void print_size(int fd, size_t i);
 void print_strs(int fd, ...);
-void spawn_command(buffer buf, void(*function)(buffer, struct array), struct array);
+void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct array);
 void free_ptr(void *);
 char *index_without_escape(char *str, char c);
 char *min_str(char *, char *);

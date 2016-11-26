@@ -25,6 +25,15 @@
 #define CLEAN() free_arguments(&args)
 #define NEW_HANDLE(name) void handle_ ## name(buffer buf, struct array args)
 
+struct handler_s {
+    char *motif;
+    int size;
+    bool (*handler)(buffer, struct array);
+    bool allow_spawn;
+};
+
+static const struct handler_s handlers[];
+
 NEW_HANDLE(default)
 {
     char *after RAII = GET(0),
@@ -176,6 +185,18 @@ NEW_HANDLE(macro_eval)
     update_macro(name, value, true);
 }
 
+static const struct handler_s handlers[] = {
+    {"LOOK_SW", 7, handle_l_swallow, true},
+    {"LOOK", 4, handle_look, true},
+    {"BALENCED_SW", 11, handle_b_swallow, true},
+    {"BALENCED", 8, handle_balenced, true},
+    {"COUNTER", 7, handle_counter, false},
+    {"STRLEN", 6, handle_strlen, false},
+    {"FORMAT", 6, handle_format, true},
+    {"MACRO_EVAL", 10, handle_macro_eval, false},
+    {"MACRO", 5, handle_macro, false}
+};
+
 #ifdef $
 #undef $
 #endif
@@ -183,22 +204,6 @@ NEW_HANDLE(macro_eval)
 
 void handle_arguments(buffer buf)
 {
-    static const struct {
-        char *motif;
-        int size;
-        void (*handler)(buffer, struct array);
-        bool allow_spawn;
-    } handlers[] = {
-        {"LOOK_SW", 7, handle_l_swallow, true},
-        {"LOOK", 4, handle_look, true},
-        {"BALENCED_SW", 11, handle_b_swallow, true},
-        {"BALENCED", 8, handle_balenced, true},
-        {"COUNTER", 7, handle_counter, false},
-        {"STRLEN", 6, handle_strlen, false},
-        {"FORMAT", 6, handle_format, true},
-        {"MACRO_EVAL", 10, handle_macro_eval, false},
-        {"MACRO", 5, handle_macro, false}
-    };
     struct array args = get_argument_list(buf);
     char *arg = pop_argument(&args, 0);
     int size;
