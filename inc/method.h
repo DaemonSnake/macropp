@@ -44,7 +44,7 @@ PROC(define ___CALL_METHOD2(line, name, arg_list, ret, body...)        \
     append_macro_nosep(METHODS_CODE, MACRO_GLUE(METHODS_CODE_TOOL__, __LINE__)) \
     ___CALL_METHOD2 (                                                   \
                      [@ ) @, , @]                                       \
-    [@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @]                    \
+    [@BALENCED '(' @, ')' @, , @, ,___METHOD_ADD_THIS @]                \
     __LINE__,
 
 /* ABSTRACT */
@@ -63,7 +63,7 @@ PROC(define ___CALL_ABSTRACT2(line, name, arg_list, ret)        \
     append_macro(METHODS_NAME, MACRO_GLUE(METHODS_NAME_TOOL__, __LINE__)) \
     ___CALL_ABSTRACT2 (                                                 \
                        [@LOOK_SW ; @, ) @]                              \
-    [@BALENCED ( @, ) @, , @, ,___METHOD_ADD_THIS @]                    \
+    [@BALENCED '(' @, ')' @, , @, ,___METHOD_ADD_THIS @]                \
     __LINE__,
 
 
