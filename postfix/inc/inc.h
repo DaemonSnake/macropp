@@ -81,7 +81,7 @@ char *index_without_escape(char *str, char c);
 char *min_str(char *, char *);
 char *append_string(char *or, char *new_end);
 char *append_string_n(char *or, char *new_end, int size_end);
-struct array get_argument_list(buffer this);
+bool fill_argument_list(buffer this, struct array *res);
 void free_arguments(struct array *);
 char *pop_argument(struct array *arg, unsigned index);
 size_t hash_string(char *);

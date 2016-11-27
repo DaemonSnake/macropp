@@ -219,12 +219,14 @@ static const struct handler_s handlers[] = {
 
 void handle_arguments(buffer buf)
 {
-    struct array args = get_argument_list(buf);
-    char *arg = pop_argument(&args, 0);
+    struct array args = {NULL, 0};
+    char *arg;
     int size;
-    
-    if (args.data == NULL)
+
+    if (!fill_argument_list(buf, &args) || args.data == NULL)
         return ;
+
+    arg = pop_argument(&args, 0);
     size = strlen(arg);
     if (size == 0)
     {

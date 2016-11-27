@@ -172,29 +172,31 @@ static char *dup_argument(char *arg, size_t size)
 /*     fflush(stdout); */
 /* } */
 
-struct array get_argument_list(buffer this)
+bool fill_argument_list(buffer this, struct array *res)
 {
     char *arg_list = copy_argument_list(this),
-        *tmp = NULL, *begin = arg_list;
-    char **result = NULL, *end = NULL;
+        *tmp = NULL,
+        *begin RAII = arg_list;
+    char *end = NULL;
     unsigned i = 0;
 
-    if (!arg_list || !(tmp = index(arg_list, ' ')))
-        goto end;
-    result = calloc(sizeof(char *), 1);
-    result[i++] = strndup(arg_list, tmp - arg_list);
+    if (!res || !arg_list || !(tmp = index(arg_list, ' ')))
+        return false;
+    free(res->data);
+    res->size = 1;
+    res->data = calloc(sizeof(char *), 1);
+    res->data[i++] = strndup(arg_list, tmp - arg_list);
     arg_list = tmp + 1;
     while ((tmp = get_end_of_argument(arg_list, false, &end)))
     {
-        result = realloc(result, (i + 1) * sizeof(char *));
-        result[i++] = dup_argument(arg_list, end - arg_list);
+        res->data = realloc(res->data, (i + 1) * sizeof(char *));
+        res->data[i++] = dup_argument(arg_list, end - arg_list);
         if (!*tmp || !*end)
             break;
         arg_list = tmp;
     }
- end:
-    free(begin);
-    return (struct array){result, i};
+    res->size = i;
+    return true;
 }
 
 void free_arguments(struct array *arg)

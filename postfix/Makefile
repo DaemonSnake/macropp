@@ -41,7 +41,7 @@ test:		$(NAME)
 		cpp example/EX.c -P | ./$(NAME)
 
 mem_check:	$(NAME)
-		cpp example/EX.c -P | valgrind ./$(NAME)
+		cpp example/EX.c -P | valgrind ./$(NAME);
 
 cpp_test:	$(NAME)
 		cpp example/foreach.cpp -P | ./$(NAME) | g++ -x c++ /dev/stdin -o example/$@
