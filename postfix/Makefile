@@ -50,7 +50,7 @@ mem_check:	$(NAME)
 		mtrace $(NAME) $(MALLOC_TRACE);
 
 valgrind:	$(NAME)
-		cpp example/EX.c -P | valgrind ./$(NAME);
+		cpp example/EX.c -P | valgrind --leak-check=full ./$(NAME);
 
 cpp_test:	$(NAME)
 		cpp example/foreach.cpp -P | ./$(NAME) | g++ -x c++ /dev/stdin -o example/$@
