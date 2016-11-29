@@ -28,6 +28,10 @@ SRC =		src/main.c		\
 		src/macro.c		\
 		src/thread.c
 
+MALLOC_TRACE =	.leaks
+
+export MALLOC_TRACE
+
 OBJ =		$(SRC:.c=.o)
 
 CFLAGS =	-W -Wall -Wextra -Iinc -g3 -pthread
@@ -41,6 +45,11 @@ test:		$(NAME)
 		cpp example/EX.c -P | ./$(NAME)
 
 mem_check:	$(NAME)
+		rm -f $(MALLOC_TRACE);
+		cpp example/EX.c -P | ./$(NAME);
+		mtrace $(NAME) $(MALLOC_TRACE);
+
+valgrind:	$(NAME)
 		cpp example/EX.c -P | valgrind ./$(NAME);
 
 cpp_test:	$(NAME)

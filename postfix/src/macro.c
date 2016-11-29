@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 #include "inc.h"
+#include <pthread.h>
 
 struct macro_node
 {
@@ -113,4 +114,17 @@ void update_macro(char *name, char *value, bool eval)
         it->text = value;
         it->size = strlen(value);
     }
+}
+
+void clean_all_macros()
+{
+    struct macro_node *next = NULL;
+    for (struct macro_node *it = list.front; it != NULL; it = next)
+    {
+        next = it->next;
+        free(it->text);
+        free(it);
+    }
+    list.front = NULL;
+    list.back = NULL;
 }

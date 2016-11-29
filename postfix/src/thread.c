@@ -35,6 +35,7 @@ static void *thread_reader2(data *this)
     $.buf->index = $.buf->size;
     proccess($.buf);
     close($.pipe[1]);
+    free(this);
     return NULL;
 }
 

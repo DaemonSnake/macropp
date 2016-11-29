@@ -230,6 +230,7 @@ void handle_arguments(buffer buf)
     size = strlen(arg);
     if (size == 0)
     {
+        free(arg);
         spawn_command(buf, handle_default, args);
         return ;
     }

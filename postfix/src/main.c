@@ -1,7 +1,6 @@
+#define _GNU_SOURCE
 #include "inc.h"
 #include <mcheck.h>
-#include <fcntl.h>
-#include <sys/stat.h>
 
 __attribute__((constructor))
 static void mem()
@@ -16,5 +15,7 @@ int main()
     while (look_for(buf, "[@", NULL, true, PROCCESS))
         handle_arguments(buf);
     delete(buf);
+    clean_all_macros();
     return 0;
 }
+

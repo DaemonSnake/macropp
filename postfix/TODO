@@ -19,5 +19,6 @@
 -Memory leak from outer space.... (get_argument_list)
 -macro name should allow string as names
 -Transfer buffer back once finished instead of writing it all (look.c)
+-cpp without -P ?????
 
 ?? -handle '\377' and 'xFF' for format
