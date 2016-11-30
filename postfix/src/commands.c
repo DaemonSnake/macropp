@@ -212,37 +212,40 @@ static const struct handler_s handlers[] = {
     {"MACRO", 5, handle_macro, false}
 };
 
+static const struct handler_s default_handler = { NULL, 0, handle_default, true };
+
 #ifdef $
 #undef $
 #endif
 #define $ handlers[i]
 
+const struct handler_s *find_handler(char *arg)
+{
+    int size = (arg ? strlen(arg) : 0);
+
+    if (size == 0)
+        return &default_handler;
+    for (unsigned i = 0; i < (sizeof(handlers) / sizeof(handlers[0])); i++)
+        if (size >= $.size && strncmp(arg, $.motif, $.size) == 0)
+            return &$;
+    return NULL;
+}
+
 void handle_arguments(buffer buf)
 {
     struct array args = {NULL, 0};
     char *arg;
-    int size;
+    const struct handler_s * handler;
 
     if (!fill_argument_list(buf, &args) || args.data == NULL)
         return ;
-
     arg = pop_argument(&args, 0);
-    size = strlen(arg);
-    if (size == 0)
-    {
-        free(arg);
-        spawn_command(buf, handle_default, args);
-        return ;
-    }
-    for (unsigned i = 0; i < (sizeof(handlers) / sizeof(handlers[0])); i++)
-        if (size >= $.size && strncmp(arg, $.motif, $.size) == 0)
-        {
-            free(arg);
-            if ($.allow_spawn)
-                spawn_command(buf, $.handler, args);
-            else
-                $.handler(buf, args);
-            return ;
-        }
-    free_arguments(&args);
+    handler = find_handler(arg);
+    free(arg);
+    if (!handler)
+        free_arguments(&args);
+    if (handler->allow_spawn)
+        spawn_command(buf, handler->handler, args);
+    else
+        handler->handler(buf, args);
 }

@@ -77,7 +77,7 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before,
             $.index = out - $.data + (swallow ? 0 : 1);
             action(0);
             if (swallow) {
-                $.index = out - $.data;
+                $.index++;
                 discard(this);
             }
             END_OK;

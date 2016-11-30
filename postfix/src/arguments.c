@@ -172,11 +172,9 @@ static char *dup_argument(char *arg, size_t size)
 /*     fflush(stdout); */
 /* } */
 
-bool fill_argument_list(buffer this, struct array *res)
+bool fill_argument_list_from_string(char *arg_list, struct array *res)
 {
-    char *arg_list = copy_argument_list(this),
-        *tmp = NULL,
-        *begin RAII = arg_list;
+    char *tmp = NULL;
     char *end = NULL;
     unsigned i = 0;
 
@@ -197,6 +195,15 @@ bool fill_argument_list(buffer this, struct array *res)
     }
     res->size = i;
     return true;
+}
+
+bool fill_argument_list(buffer this, struct array *res)
+{
+    char *arg_list = copy_argument_list(this);
+    bool result = fill_argument_list_from_string(arg_list, res);
+
+    free(arg_list);
+    return result;
 }
 
 void free_arguments(struct array *arg)
