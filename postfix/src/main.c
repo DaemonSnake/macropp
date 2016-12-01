@@ -16,7 +16,5 @@ int main()
     /* mtrace(); */
     loop();
     clean_all_macros();
-    /* muntrace(); */
     return 0;
 }
-

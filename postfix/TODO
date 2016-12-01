@@ -1,3 +1,5 @@
+TODO
+
 -new instructions:
      -> @FUNCTION //@foreach, @args, @if, @else, @elseif etc...
      -> @CALL
@@ -16,9 +18,12 @@
                           where ALT is an alternative before reading
      -> Balenced from char to string to handle correctly '(@' and '@)'
 
--Memory leak from outer space.... (get_argument_list)
--macro name should allow string as names
--Transfer buffer back once finished instead of writing it all (look.c)
--cpp without -P ?????
 
-?? -handle '\377' and 'xFF' for format
+ISSUES:
+        -macro name should allow string as names
+        -Transfer buffer back once finished instead of writing it all (look.c)
+        -cpp without -P ?????
+        -handling of ignoring strings is not really functional
+
+INTEROGATIONS:
+        -handle '\377' and 'xFF' for format
