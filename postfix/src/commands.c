@@ -42,7 +42,7 @@ NEW_HANDLE(default)
     CLEAN();
     if (!balanced_look_for(buf, '{', '}', before, false, PROCCESS))
         return false;
-    write(buf->out, after, strlen(after));
+    print_strs(buf, after, 0);
     return true;
 }
 
@@ -55,7 +55,7 @@ NEW_HANDLE(look)
     CLEAN();
     if (!look_for(buf, motif, before, false, PROCCESS))
         return false;
-    write(buf->out, after, strlen(after));
+    print_strs(buf, after, 0);
     return true;
 }
 
@@ -68,7 +68,7 @@ NEW_HANDLE(l_swallow)
     CLEAN();
     if (!look_for(buf, motif, before, true, PROCCESS))
         return false;
-    write(buf->out, after, strlen(after));
+    print_strs(buf, after, 0);
     return true;
 }
 
@@ -89,7 +89,7 @@ NEW_HANDLE(balenced)
     out = out_tmp[0];
     if (!balanced_look_for(buf, in, out, before, false, PROCCESS))
         return false;
-    write(buf->out, after, strlen(after));
+    print_strs(buf, after, 0);
     return true;
 }
 
@@ -110,7 +110,7 @@ NEW_HANDLE(b_swallow)
     out = out_tmp[0];
     if (!balanced_look_for(buf, in, out, before, true, PROCCESS))
         return false;
-    write(buf->out, after, strlen(after));
+    print_strs(buf, after, 0);
     return true;
 }
 
@@ -125,13 +125,13 @@ NEW_HANDLE(counter)
     if (type < 0)
         return false;
     if (to_mangle)
-        print_strs(buf->out, to_mangle, "__", NULL);
+        print_strs(buf, to_mangle, "__", NULL);
     if (type == 0)
-        print_size(buf->out, i);
+        print_size(buf, i);
     else if (type == 1)
-        print_size(buf->out, ++i);
+        print_size(buf, ++i);
     else
-        print_size(buf->out, (i == 0 ? i : i - 1));
+        print_size(buf, (i == 0 ? i : i - 1));
     return true;
 }
 
@@ -144,8 +144,8 @@ NEW_HANDLE(strlen)
     if (str == NULL)
         return false;
     if ((begin = index(str, '"')) == NULL || (end = rindex(++begin, '"')) == NULL)
-        return (print_size(buf->out, 0), false);
-    print_size(buf->out, end - begin);
+        return (print_size(buf, 0), false);
+    print_size(buf, end - begin);
     return true;
 }
 
@@ -160,10 +160,11 @@ NEW_HANDLE(format)
     while(it > (char *)1)
     {
         tmp = index(it, '%');
+        buf->input_index += (tmp ? tmp: end) - it;
         write(buf->out, it, (tmp ? tmp: end) - it);
         it = tmp;
         if (it && (tmp = GET(++i)) != NULL) {
-            print_strs(buf->out, tmp, NULL);
+            print_strs(buf, tmp, NULL);
             free(tmp);
         }
         it++;

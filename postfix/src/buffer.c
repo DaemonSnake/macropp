@@ -1,4 +1,5 @@
 #include "inc.h"
+#include <stdarg.h>
 
 buffer new(int in, int out)
 {
@@ -13,6 +14,7 @@ buffer new(int in, int out)
     $.out = out;
     $.stream_finished = false;
     $.next = NULL;
+    $.input_index = 0;
     return this;
 }
 
@@ -29,6 +31,7 @@ buffer new_string(char *str, int out)
     $.out = out;
     $.stream_finished = false;
     $.next = NULL;
+    $.input_index = 0;
     return this;
 }
 
@@ -36,9 +39,12 @@ buffer new_transfer(buffer this, int new_in, int out)
 {
     buffer tmp = new_string($.data, out);
 
+    if (!this)
+        return NULL;
     tmp->in = $.in;
     tmp->index = $.index;
     tmp->next = $.next;
+    tmp->input_index = $.input_index;
     $.in = new_in;
     $.data = 0;
     $.size = 0;
@@ -74,6 +80,7 @@ void proccess(buffer this)
         return ;
     if ($.index >= $.size)
     {
+        $.input_index += $.size;
         write($.out, $.data, $.size);
         free($.data);
         $.data = NULL;
@@ -81,6 +88,7 @@ void proccess(buffer this)
         $.size = 0;
         return ;
     }
+    $.input_index += $.index;
     write($.out, $.data, $.index);
     memmove($.data, $.data + $.index, $.size - $.index);
     $.size -= $.index;
@@ -128,4 +136,31 @@ void __read(buffer this)
             return (void)($.stream_finished = true);
     $.size += len;
     $.data[$.size] = '\0';
+}
+
+void print_strs(buffer this, ...)
+{
+    va_list ap;
+    char *str;
+    int len;
+
+    va_start(ap, this);
+    while ((str = va_arg(ap, char *)) != NULL) {
+        len = strlen(str);
+        this->input_index += len;
+        write(this->out, str, len);
+    }
+    va_end(ap);
+}
+
+void print_size(buffer this, size_t i)
+{
+    char *number;
+    int len;
+
+    asprintf(&number, "%lu", i);
+    len = strlen(number);
+    this->input_index += len;
+    write(this->out, number, len);
+    free(number);
 }

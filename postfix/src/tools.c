@@ -20,11 +20,8 @@
  * THE SOFTWARE.
  */
 
-#define _GNU_SOURCE
-#include <string.h>
-#include <stdlib.h>
 #include <stdarg.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 void free_all(void *front, ...)
@@ -36,26 +33,6 @@ void free_all(void *front, ...)
     while ((front = va_arg(ap, void *)) != NULL)
         free(front);
     va_end(ap);
-}
-
-void print_strs(int fd, ...)
-{
-    va_list ap;
-    char *str;
-
-    va_start(ap, fd);
-    while ((str = va_arg(ap, char *)) != NULL)
-        write(fd, str, strlen(str));
-    va_end(ap);
-}
-
-void print_size(int fd, size_t i)
-{
-    char *number;
-
-    asprintf(&number, "%lu", i);
-    write(fd, number, strlen(number));
-    free(number);
 }
 
 void free_ptr(void *ptr)

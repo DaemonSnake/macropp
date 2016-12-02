@@ -87,6 +87,7 @@ void expand_macro(buffer this, char *name)
 
     if (!it)
         return ;
+    this->input_index += it->size;
     write(this->out, it->text, it->size);
 }
 

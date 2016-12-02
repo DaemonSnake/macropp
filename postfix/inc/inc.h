@@ -45,6 +45,7 @@ struct buffer
     int in, out;
     bool stream_finished;
     buffer next;
+    size_t input_index;
 };
 
 struct array
@@ -73,8 +74,8 @@ buffer new_transfer(buffer this, int new_in, int out);
 int string_index(char *motif, ...);
 int int_index(char *str, char car);
 char *replace_special_characters(char *str);
-void print_size(int fd, size_t i);
-void print_strs(int fd, ...);
+void print_size(buffer this, size_t i);
+void print_strs(buffer this, ...);
 void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct array);
 void free_ptr(void *);
 char *index_without_escape(char *str, char c);

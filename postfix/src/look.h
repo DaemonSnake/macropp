@@ -36,7 +36,7 @@
         else if (type == PROCCESS) {                                    \
             proccess(this);                                             \
             if (before)                                                 \
-                write($.out, before, strlen(before));                   \
+                print_strs(this, before, 0);                            \
             copy = (void*)0x42;                                         \
         }                                                               \
     }
@@ -108,12 +108,12 @@
     {                                                   \
         if (copy && type == COPY)                       \
         {                                               \
-            print_strs($.out, copy, NULL);              \
+            print_strs(this, copy, NULL);               \
             free(copy);                                 \
         }                                               \
         if ($.data)                                     \
         {                                               \
-            print_strs($.out, $.data + $.index, NULL);  \
+            print_strs(this, $.data + $.index, NULL);   \
             free($.data);                               \
             $.data = NULL;                              \
         }                                               \
