@@ -59,6 +59,7 @@ buffer new_string(char *str, int out);
 void delete(buffer this);
 void exit_(buffer this);
 void proccess(buffer this);
+void proccess_found(buffer this, bool finished, char *after);
 void discard(buffer this);
 void __read(buffer this);
 char *look_for(buffer this, char *motif, char *before, bool swallow, action_type type);

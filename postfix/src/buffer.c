@@ -76,6 +76,11 @@ void exit_(buffer this)
 
 void proccess(buffer this)
 {
+    proccess_found(this, false, NULL);
+}
+
+void proccess_found(buffer this, bool finished, char *after)
+{
     if ($.size == 0)
         return ;
     if ($.index >= $.size)
@@ -86,6 +91,10 @@ void proccess(buffer this)
         $.data = NULL;
         $.index = 0;
         $.size = 0;
+        if (finished) {
+            print_strs(this, after, 0);
+            //alt
+        }
         return ;
     }
     $.input_index += $.index;
@@ -94,7 +103,12 @@ void proccess(buffer this)
     $.size -= $.index;
     $.data[$.size] = '\0';
     $.index = 0;
+    if (finished) {
+        print_strs(this, after, 0);
+        //alt
+    }
 }
+
 
 void discard(buffer this)
 {

@@ -34,9 +34,7 @@
             discard(this);                                              \
         }                                                               \
         else if (type == PROCCESS) {                                    \
-            proccess(this);                                             \
-            if (before)                                                 \
-                print_strs(this, before, 0);                            \
+            proccess_found(this, (before != NULL), before);             \
             copy = (void*)0x42;                                         \
         }                                                               \
     }
