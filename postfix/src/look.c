@@ -10,15 +10,15 @@ char *look_for(buffer this, char *motif, char *before, bool swallow, action_type
     while (!$.stream_finished)
     {
         NEW_READ;
-        if (!(found = strstr($.data + $.index, motif))) {
+        found = strstr($.data + $.index, motif);
+        if (!ignore_literals(this, &in_literal, found))
+            continue;
+        if (!found) {
             $.index = $.size - motif_len;
             ACTION(0);
             __read(this);
             continue ;
         }
-        if (!ignore_literals(this, &in_literal, found))
-            continue;
-
         $.index = found - $.data;
         ACTION(before);
         $.index += motif_len;
@@ -42,13 +42,13 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before,
 
         if (!started)
         {
-            if (!(in = index($.data + $.index, motif))) {
+            in = index($.data + $.index, motif);
+            if (!ignore_literals(this, &in_literal, in))
+                continue ;
+            if (!(in)) {
                 $.index = $.size;
                 continue ;
             }
-            if (!ignore_literals(this, &in_literal, in))
-                continue ;
-
             $.index = in - $.data;
             started = true;
             ACTION(before);
@@ -61,13 +61,12 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before,
 
         out = min_str(index($.data + $.index, motif),
                       index($.data + $.index, cancel));
+        if (!ignore_literals(this, &in_literal, out))
+            continue ;
         if (!out) {
             $.index = $.size;
             continue ;
         }
-
-        if (!ignore_literals(this, &in_literal, out))
-            continue ;
 
         $.index = out - $.data + 1;
         if (*out == cancel && --depth == 0)
@@ -88,7 +87,7 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before,
 
 static char *index_inf(char *str, char motif, char *other)
 {
-    if (!(str = index(str, motif)) || str > other)
+    if (!(str = index(str, motif)) || (other && str > other))
         return NULL;
     return str;
 }
