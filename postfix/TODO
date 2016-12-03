@@ -8,16 +8,14 @@ TODO
      -> @PUSH_RULE and @SEEK
      -> @SWITCH
                 // the first that matches is the one selected
-                // [@SWITCH [@LOOK ; @, @, [@MACRO class_prototype @] @] @, [@LOOK { @, @, [@ [@MACRO end_class @] @] @]
-     -> @FALLBACK
-                // if the first command doesn't work, fall on the other
-                // [@FALLBACK [@ [@MACRO end_class @] @] @, [@LOOK ; @, @, [@MACRO class_prototype @] @] @]
+                // [@SWITCH [@LOOK ; @, @, [@MACRO class_prototype @] @] @, [@ [@MACRO end_class @] @] @]
 
 -make look behave as follows:
      -> [@LOOK MOTIF @, AFTER @, BEFORE [@, ALT]* @]
                           where ALT is an alternative before reading
      -> Balenced from char to string to handle correctly '(@' and '@)'
 
+-format: allow numbers after '%' to specify what argument to read
 
 ISSUES:
         -macro name should allow string as names
