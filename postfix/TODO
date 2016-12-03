@@ -22,8 +22,6 @@ TODO
 ISSUES:
         -macro name should allow string as names
         -Transfer buffer back once finished instead of writing it all (look.c)
-        -cpp without -P ?????
-        -handling of ignoring strings is not really functional
 
 INTEROGATIONS:
         -handle '\377' and 'xFF' for format
