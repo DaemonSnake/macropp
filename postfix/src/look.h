@@ -21,6 +21,16 @@
  */
 #pragma once
 
+typedef enum {
+    a_true = 1, b_true = 2, ab_false = 0
+} trilean;
+
+static bool ignore_literals(buffer this, trilean *in_literal, char *found);
+static char *index_inf(char *str, char motif, char *other);
+static void action(buffer this, action_type type, char **result, char *before);
+
+#define ACTION(x...) action(this, type, &result, x)
+
 #define NEW_READ                                \
     if ($.index >= $.size || $.size == 0)       \
     {                                           \
