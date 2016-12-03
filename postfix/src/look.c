@@ -1,29 +1,112 @@
 #include "inc.h"
 #include "look.h"
 
+typedef enum {
+    a_true = 1, b_true = 2, ab_false = 0
+} trilean;
+
+static char *index_inf(char *str, char motif, char *other)
+{
+    if (!(str = index(str, motif)) || str > other)
+        return NULL;
+    return str;
+}
+
+static void action(buffer this, action_type type, char **result, char *before)
+{
+    if ($.size == 0)
+        return ;
+    $.index = ($.index < 0 ? 0 :
+               ($.index > $.size ? $.size : $.index));
+    if (type == COPY) {
+        *result = append_string(append_string_n(*result, $.data, $.index),
+                             before);
+        discard(this);
+    }
+    else if (type == PROCCESS) {
+        proccess_found(this, (before != NULL), before);
+        *result = (void*)0x42;
+    }
+}
+
+#define ACTION(x...) action(this, type, &result, x)
+
+static bool ignore_literals(buffer this, trilean *in_literal, char *found)
+{
+    char *index_str = index_inf($.data + $.index, '"', found),
+        *index_char = index_inf($.data + $.index, '\'', found);
+
+    if (*in_literal) {
+        char symb = (*in_literal == a_true ? '"' : '\''),
+            *to_finish = (symb == '"' ? index_str : index_char),
+            *out = index_without_escape(to_finish + 1, symb);
+
+        if (out == NULL) {
+            $.index = $.size;
+            return false;
+        }
+        $.index = out - $.data + 1;
+        if (out > found)
+            return false;
+        *in_literal = ab_false;
+    }
+
+    for (; index_str || index_char;
+         index_str = index_inf($.data + $.index, '"', found),
+         index_char = index_inf($.data + $.index, '\'', found))
+    {
+        char *min = min_str(index_str, index_char),
+            symb = (min == index_str ? '"' : '\''),
+            *max = (symb == '"' ? index_char : index_str),
+            *out = index_without_escape(min + 1, symb);
+
+        if (out == NULL) {
+            *in_literal = (symb == '"' ? a_true : b_true);
+            $.index = $.size;
+            return false;
+        }
+        $.index = out - $.data + 1;
+
+        if (out > found)
+            return false;
+        if (!max || max < out)
+            continue ;
+
+        if (!(out = index(max + 1, symb))) {
+            $.index = $.size;
+            return false;
+        }
+        $.index = out - $.data;
+        if (out > found)
+            return false;
+    }
+    return true;
+}
+
 char *look_for(buffer this, char *motif, char *before, bool swallow, action_type type)
 {
     int motif_len = strlen(motif);
-    char *copy = 0, *found = 0;
-    bool in_str = false, in_char = false;
+    char *result = 0, *found = 0;
+    trilean in_literal = ab_false;
 
-    ACTION;
+    /* ACTION; */
     while (!$.stream_finished)
     {
         NEW_READ;
-        found = strstr($.data + $.index, motif);
-        HANDLE_STR(in_str, '"', found);
-        HANDLE_STR(in_char, '\'', found);
-        if (found != NULL) {
-            $.index = found - $.data;
-            action(before);
-            $.index += motif_len;
-            (swallow ? discard(this) : action(0));
-            END_OK;
+        if (!(found = strstr($.data + $.index, motif))) {
+            $.index = $.size - motif_len;
+            ACTION(0);
+            __read(this);
+            continue ;
         }
-        $.index = $.size - motif_len;
-        action(0);
-        __read(this);
+        if (!ignore_literals(this, &in_literal, found))
+            continue;
+
+        $.index = found - $.data;
+        ACTION(before);
+        $.index += motif_len;
+        (swallow ? discard(this) : ACTION(0));
+        END_OK;
     }
     END_KO;
 }
@@ -31,51 +114,50 @@ char *look_for(buffer this, char *motif, char *before, bool swallow, action_type
 char *balanced_look_for(buffer this, char motif, char cancel, char *before,
                         bool swallow, action_type type)
 {
-    char *copy = 0, *in = 0, *out = 0;
+    char *result = 0, *in = 0, *out = 0;
     int depth = 0;
-    bool started = false, in_str = false, in_char = false;
+    bool started = false;
+    trilean in_literal = false;
 
-    ACTION
+    /* ACTION */
     while (!$.stream_finished)
     {
         NEW_READ;
-        
+
         if (!started)
         {
-            in = index($.data + $.index, motif);
-            HANDLE_STR(in_str, '"', in);
-            HANDLE_STR(in_char, '\'', in);
-            if (in)
-            {
-                $.index = in - $.data;
-                started = true;
-                action(before);
-                if (swallow) {
-                    $.index++;
-                    discard(this);
-                    depth = 1;
-                }
-            }
-            else
+            if (!(in = index($.data + $.index, motif))) {
                 $.index = $.size;
-            continue;
+                continue ;
+            }
+            if (!ignore_literals(this, &in_literal, in))
+                continue ;
+
+            $.index = in - $.data;
+            started = true;
+            ACTION(before);
+            if (swallow) {
+                $.index++;
+                discard(this);
+                depth = 1;
+            }
         }
 
         out = min_str(index($.data + $.index, motif),
                       index($.data + $.index, cancel));
-        HANDLE_STR(in_str, '"', out);
-        HANDLE_STR(in_char, '\'', out);
-
-        if (!out)
-        {
+        if (!out) {
             $.index = $.size;
-            continue;
+            continue ;
         }
+
+        if (!ignore_literals(this, &in_literal, out))
+            continue ;
+
         $.index = out - $.data + 1;
         if (*out == cancel && --depth == 0)
         {
             $.index = out - $.data + (swallow ? 0 : 1);
-            action(0);
+            ACTION(0);
             if (swallow) {
                 $.index++;
                 discard(this);

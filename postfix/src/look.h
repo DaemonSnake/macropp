@@ -21,93 +21,23 @@
  */
 #pragma once
 
-#define ACTION                                                          \
-    void action(char *before)                                           \
-    {                                                                   \
-        if ($.size == 0)                                                \
-            return ;                                                    \
-        $.index = ($.index < 0 ? 0 :                                    \
-                   ($.index > $.size ? $.size : $.index));              \
-        if (type == COPY) {                                             \
-            copy = append_string(append_string_n(copy, $.data, $.index), \
-                                 before);                               \
-            discard(this);                                              \
-        }                                                               \
-        else if (type == PROCCESS) {                                    \
-            proccess_found(this, (before != NULL), before);             \
-            copy = (void*)0x42;                                         \
-        }                                                               \
-    }
-
-#define HANDLE_STR(IN_NAME, CH, FOUND)                                  \
-    {                                                                   \
-        char *str_index = index_without_escape($.data + $.index, CH);   \
-                                                                        \
-        if (IN_NAME)                                                    \
-        {                                                               \
-            if (str_index)                                              \
-            {                                                           \
-                $.index = str_index - $.data + 1;                       \
-                IN_NAME = false;                                        \
-                continue ;                                              \
-            }                                                           \
-            else                                                        \
-            {                                                           \
-                $.index = $.size;                                       \
-                continue ;                                              \
-            }                                                           \
-        }                                                               \
-        else if (str_index)                                             \
-        {                                                               \
-            char *begin_str = str_index;                                \
-                                                                        \
-            str_index = index_without_escape(begin_str + 1, CH);        \
-            if (!FOUND)                                                 \
-            {                                                           \
-                if (str_index)                                          \
-                {                                                       \
-                    $.index = str_index - $.data + 1;                   \
-                    continue;                                           \
-                }                                                       \
-                IN_NAME = true;                                         \
-                $.index = $.size;                                       \
-                continue ;                                              \
-            }                                                           \
-            else if (begin_str < FOUND)                                 \
-            {                                                           \
-                if (!str_index)                                         \
-                {                                                       \
-                    IN_NAME = true;                                     \
-                    $.index = $.size;                                   \
-                    continue;                                           \
-                }                                                       \
-                else if (FOUND < str_index)                             \
-                {                                                       \
-                    $.index = str_index - $.data + 1;                   \
-                    continue ;                                          \
-                }                                                       \
-            }                                                           \
-        }                                                               \
-    }
-
-
 #define NEW_READ                                \
     if ($.index >= $.size || $.size == 0)       \
     {                                           \
-        action(0);                              \
+        ACTION(0);                              \
         __read(this);                           \
         continue;                               \
     }
 
 #define END_OK                                  \
-    return copy;
+    return result;
 
 #define END_KO                                          \
     {                                                   \
-        if (copy && type == COPY)                       \
+        if (result && type == COPY)                     \
         {                                               \
-            print_strs(this, copy, NULL);               \
-            free(copy);                                 \
+            print_strs(this, result, NULL);             \
+            free(result);                               \
         }                                               \
         if ($.data)                                     \
         {                                               \
