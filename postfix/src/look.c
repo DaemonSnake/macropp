@@ -115,9 +115,11 @@ static bool ignore_literals(buffer this, trilean *in_literal, char *found)
         *index_char = index_inf($.data + $.index, '\'', found);
 
     if (*in_literal) {
-        char symb = (*in_literal == a_true ? '"' : '\''),
-            *to_finish = (symb == '"' ? index_str : index_char),
-            *out = index_without_escape(to_finish + 1, symb);
+        bool is_str = (*in_literal == a_true);
+        char *to_finish = (is_str ? index_str : index_char),
+            *out = (to_finish && *to_finish ?
+                    index_without_escape(to_finish + 1, (is_str ? '"' : '\'')) :
+                    NULL);
 
         if (out == NULL) {
             $.index = $.size;
@@ -126,6 +128,8 @@ static bool ignore_literals(buffer this, trilean *in_literal, char *found)
         $.index = out - $.data + 1;
         if (out > found)
             return false;
+        index_str = (index_str <= out ? NULL: index_str);
+        index_char = (index_char <= out ? NULL : index_char);
         *in_literal = ab_false;
     }
 
