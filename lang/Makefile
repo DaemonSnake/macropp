@@ -18,47 +18,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-SRC =		src/main.c		\
-		src/look.c		\
-		src/tools.c		\
-		src/buffer.c		\
-		src/string_tools.c	\
-		src/commands.c		\
-		src/arguments.c		\
-		src/macro.c		\
-		src/thread.c
+%.o: %.c
+	cpp $< $(CFLAGS) | ./postfix/postfix | cpp $(CFLAGS) | cpp $(CFLAGS) | \
+	gcc -c -x c $(CFLAGS) -o $@ /dev/stdin;
 
-MALLOC_TRACE =	.leaks
+SRC = 	src/object.c	\
+	src/Object.c	\
+	String.c	\
+	main.c		\
 
-export MALLOC_TRACE
+OBJ= 	$(SRC:.c=.o)
 
-OBJ =		$(SRC:.c=.o)
+CFLAGS += -fplan9-extensions -W -Wall -Wextra
 
-CFLAGS =	-W -Wall -Wextra -Iinc -g3 -pthread
+main:	$(OBJ)
+	gcc $(CFLAGS) $(LDFLAGS) $(OBJ) -o $@;
 
-NAME =		postfix
-
-$(NAME):	$(OBJ)
-		gcc $(OBJ) -o $@ $(CFLAGS) $(LDFLAGS)
-
-test:		$(NAME)
-		cpp example/EX.c -P | ./$(NAME)
-
-mem_check:	$(NAME)
-		rm -f $(MALLOC_TRACE);
-		cpp example/EX.c -P | ./$(NAME);
-		mtrace $(NAME) $(MALLOC_TRACE);
-
-valgrind:	$(NAME)
-		cpp example/EX.c -P | valgrind --leak-check=full ./$(NAME);
-
-cpp_test:	$(NAME)
-		cpp example/foreach.cpp -P | ./$(NAME) | g++ -x c++ /dev/stdin -o example/$@
+out:
+	@cpp test.c $(CFLAGS) | cpp $(CFLAGS) | cpp $(CFLAGS) | grep -v '#'
 
 clean:
-		rm -f $(OBJ)
+	rm -f $(OBJ)
 
-fclean:		clean
-		rm -f $(NAME)
+fclean: clean
+	rm -f main
 
-re: 		fclean $(NAME)
+re: fclean main
