@@ -176,23 +176,25 @@ bool fill_argument_list_from_string(char *arg_list, struct array *res)
 {
     char *tmp = NULL;
     char *end = NULL;
-    unsigned i = 0;
+    unsigned i = 0, size = 8;
 
     if (!res || !arg_list || !(tmp = index(arg_list, ' ')))
         return false;
     free(res->data);
     res->size = 1;
-    res->data = calloc(sizeof(char *), 1);
+    res->data = calloc(sizeof(char *), size);
     res->data[i++] = strndup(arg_list, tmp - arg_list);
     arg_list = tmp + 1;
     while ((tmp = get_end_of_argument(arg_list, false, &end)))
     {
-        res->data = realloc(res->data, (i + 1) * sizeof(char *));
+        if (i >= size)
+            res->data = realloc(res->data, (size += 8) * sizeof(char *));
         res->data[i++] = dup_argument(arg_list, end - arg_list);
         if (!*tmp || !*end)
             break;
         arg_list = tmp;
     }
+    res->data = realloc(res->data, i * sizeof(char *));
     res->size = i;
     return true;
 }
