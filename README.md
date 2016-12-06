@@ -1,11 +1,4 @@
 # postfix, a Unix/GNU command-line macro-system
-<html>
-<header>
-<style>
-  p { text-indent: 10px; }
-</style>
-</header
-</html>
 When feeding postfix some text it will look for the following motif :</br>
 ```c
 [@COMMAND_NAME ARG_0 @, ARG_1 @, ... @]
