@@ -26,7 +26,8 @@ SRC =		src/main.c		\
 		src/commands.c		\
 		src/arguments.c		\
 		src/macro.c		\
-		src/thread.c
+		src/thread.c		\
+		src/list.c
 
 MALLOC_TRACE =	.leaks
 

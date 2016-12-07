@@ -46,3 +46,7 @@ class(String, Object)
 
 [@MACRO METHOD @]
 [@MACRO CLASS @]
+
+[@LIST PUSH_BACK @, METHODS @, main @]
+[@LIST PUSH_BACK @, METHODS @, printf @]
+[@LIST PRINT @, METHODS @, , @]

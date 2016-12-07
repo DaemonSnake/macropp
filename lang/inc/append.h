@@ -26,7 +26,7 @@
 #define PROC(arg...) NL HS arg NL
 
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
-    
+
 #define IFDEF(name, body...)                    \
     PROC(ifdef name)                            \
     body                                        \

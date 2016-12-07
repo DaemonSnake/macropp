@@ -201,6 +201,25 @@ NEW_HANDLE(macro_eval)
     return true;
 }
 
+NEW_HANDLE(list)
+{
+    char *subc RAII = GET(0),
+        *name RAII = GET(1);
+    size_t hash = hash_string(name);
+    bool ret = true;
+
+    if (strcmp(subc, "PRINT") == 0) {
+        char *sep RAII = GET(2);
+        print_list_id(buf, hash, (sep ? sep : " "));
+    }
+    else if (strcmp(subc, "PUSH_BACK") == 0)
+        list_push_back(hash, GET(2));
+    else
+        ret = false;
+    CLEAN();
+    return ret;
+}
+
 static const struct handler_s handlers[] = {
     {"LOOK_SW", 7, handle_l_swallow, true},
     {"LOOK", 4, handle_look, true},
@@ -210,7 +229,8 @@ static const struct handler_s handlers[] = {
     {"STRLEN", 6, handle_strlen, false},
     {"FORMAT", 6, handle_format, true},
     {"MACRO_EVAL", 10, handle_macro_eval, false},
-    {"MACRO", 5, handle_macro, false}
+    {"MACRO", 5, handle_macro, false},
+    {"LIST", 4, handle_list, false}
 };
 
 static const struct handler_s default_handler = { NULL, 0, handle_default, true };

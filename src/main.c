@@ -15,6 +15,5 @@ int main()
 {
     /* mtrace(); */
     loop();
-    clean_all_macros();
     return 0;
 }

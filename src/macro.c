@@ -117,7 +117,8 @@ void update_macro(char *name, char *value, bool eval)
     }
 }
 
-void clean_all_macros()
+__attribute__((destructor))
+static void clean_all_macros()
 {
     struct macro_node *next = NULL;
     for (struct macro_node *it = list.front; it != NULL; it = next)

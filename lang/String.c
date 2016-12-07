@@ -56,5 +56,5 @@ class(String, Object)
             return $.c_str[index];
     }
 
-    abstract f() void;
+    /* abstract f() void; */
 }

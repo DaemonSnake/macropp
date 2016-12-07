@@ -91,5 +91,7 @@ void update_macro(char *, char *, bool);
 void expand_macro(buffer, char *);
 bool is_identifier(char *str);
 void unchar_string(char *str);
-void clean_all_macros();
 bool fill_argument_list_from_string(char *arg_list, struct array *res);
+void list_push_back(size_t, char *);
+void list_push_front(size_t, char *);
+void print_list_id(buffer, size_t, char *);
