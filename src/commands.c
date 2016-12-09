@@ -214,6 +214,38 @@ NEW_HANDLE(list)
     }
     else if (strcmp(subc, "PUSH_BACK") == 0)
         list_push_back(hash, GET(2));
+    else if (strcmp(subc, "PUSH_FRONT") == 0)
+        list_push_front(hash, GET(2));
+    else if (strcmp(subc, "POP_BACK") == 0)
+        list_pop_back(hash);
+    else if (strcmp(subc, "POP_FRONT") == 0)
+        list_pop_front(hash);
+    else if (strcmp(subc, "PARSE") == 0) {
+        char *value RAII = GET(2);
+        list_parse_parenth(hash, value);
+    }
+    else if (strcmp(subc, "REMOVE") == 0)
+    {
+        for (unsigned i = 2; i < args.size - 1; i++)
+        {
+            char *index_str RAII = GET(i);
+            int value = atoi(index_str);
+            if (value < 0)
+                break;
+            list_remove_item(hash, (unsigned)value);
+        }
+    }
+    else if (strcmp(subc, "ITEM") == 0)
+    {
+        char *index_str RAII = GET(2);
+        int value = atoi(index_str);
+        if (value >= 0)
+            print_strs(buf, list_get_item(hash, (unsigned)value), NULL);
+        else
+            ret = false;
+    }
+    else if (strcmp(subc, "CLEAR") == 0)
+        list_clear(hash);
     else
         ret = false;
     CLEAN();

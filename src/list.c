@@ -102,6 +102,7 @@ void list_push_front(size_t hash, char *front)
     if (it->next)
         it->next->prev = it;
     node->front = it;
+    node->size++;
 }
 
 void list_push_back(size_t hash, char *back)
@@ -124,29 +125,121 @@ void list_push_back(size_t hash, char *back)
     if (it->prev)
         it->prev->next = it;
     node->back = it;
+    node->size++;
+}
+
+static void remove_empty_node(struct list_node *node)
+{
+    if (node == NULL)
+        return ;
+    if (node->prev == NULL)
+        list.front = node->next;
+    else
+        node->prev->next = node->next;
+    if (node->next == NULL)
+        list.back = node->prev;
+    else
+        node->next->prev = node->prev;
 }
 
 void list_pop_front(size_t hash)
 {
-    (void)hash;
+    struct list_node *node = find_list_node(hash);
+    struct list_node_item *it;
+
+    if (node == NULL)
+        return ;
+    it = node->front;
+    node->front = it->next;
+    node->size--;
+    if (it->next)
+        it->next->prev = NULL;
+    else {
+        remove_empty_node(node);
+        free(node);
+    }
+    free(it->text);
+    free(it);
 }
 
 void list_pop_back(size_t hash)
 {
-    (void)hash;
+    struct list_node *node = find_list_node(hash);
+    struct list_node_item *it;
+
+    if (node == NULL)
+        return ;
+    it = node->back;
+    node->back = it->prev;
+    node->size--;
+    if (it->prev)
+        it->prev->next = NULL;
+    else {
+        remove_empty_node(node);
+        free(node);
+    }
+    free(it->text);
+    free(it);
 }
 
 void list_remove_item(size_t hash, unsigned index)
 {
-    (void)hash;
-    (void)index;
+    struct list_node *node = find_list_node(hash);
+    unsigned i = 0;
+
+    if (!node || index >= node->size)
+        return ;
+    if (--node->size == 0)
+        remove_empty_node(node);
+    for (struct list_node_item *it = node->front; it != NULL; (it = it->next, i++))
+        if (i == index)
+        {
+            if (it->prev == NULL)
+                node->front = it->next;
+            else
+                it->prev->next = it->next;
+            if (it->next == NULL)
+                node->back = it->prev;
+            else
+                it->next->prev = it->prev;
+            free(it->text);
+            free(it);
+            break;
+        }
+    if (node->size == 0)
+        free(node);
 }
 
 char *list_get_item(size_t hash, unsigned index)
 {
+    struct list_node *node = find_list_node(hash);
+    struct list_node_item *it;
+    unsigned i = 0;
+
+    if (!node || node->size <= index)
+        return NULL;
+    for (it = node->front; it != NULL && i < index; (it = it->next, i++));
+    return it->text;
+}
+
+void list_parse_parenth(size_t hash, char *value)
+{
     (void)hash;
-    (void)index;
-    return NULL;
+    (void)value;
+}
+
+void list_clear(size_t hash)
+{
+    struct list_node *node = find_list_node(hash);
+
+    remove_empty_node(node);
+    for (struct list_node_item *it = node->front, *next = NULL;
+         it != NULL; it = next) {
+        next = it->next;
+        free(it->text);
+        free(it);
+    }
+    free(node);
 }
 
 __attribute__((destructor))
