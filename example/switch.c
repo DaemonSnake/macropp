@@ -1,4 +1,4 @@
-#define case_b case [@BALENCED_SW '{' @, '}' @, break; @, : @]
+#define case_b(value) case value [@BALENCED_SW '{' @, '}' @, break; @, : @]
 
 int main()
 {
@@ -6,7 +6,7 @@ int main()
 
     switch(i)
     {
-        case_b 0 {
+        case_b(0) {
         }
     }
 }

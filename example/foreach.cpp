@@ -6,7 +6,7 @@
         auto &&x = expr;                                                \
         for (auto it = x.begin(); it != x.end(); ++it)                  \
         {                                                               \
-            auto name = *it; [@ }} @]
+            auto name = *it;[@ }} @]
 
 int main()
 {
@@ -14,4 +14,5 @@ int main()
     {
         printf("%d\n", x);
     }
+    printf("End of func\n");
 }
