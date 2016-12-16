@@ -46,7 +46,6 @@ input file:</br>
 [@BALENCED '{' @, '}' @, printf("after block\n"); @, printf("before block\n"); @]
 {
 }
-}
 ```
 output:</br>
 ```c
