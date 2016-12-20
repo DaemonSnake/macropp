@@ -54,8 +54,9 @@ struct array
     unsigned size;
 };
 
-buffer new(int in, int out);
-buffer new_string(char *str, int out);
+buffer buffer_new(int in, int out);
+buffer buffer_new_string(char *str, int out);
+buffer buffer_new_transfer(buffer this, int new_in, int out);
 void delete(buffer this);
 void exit_(buffer this);
 void proccess(buffer this);
@@ -71,7 +72,6 @@ void handle_arguments(buffer buf);
 char *get_argument(char *arg_list, int index);
 void free_all(void *, ...);
 void raii_free(void *);
-buffer new_transfer(buffer this, int new_in, int out);
 int string_index(char *motif, ...);
 int int_index(char *str, char car);
 char *replace_special_characters(char *str);

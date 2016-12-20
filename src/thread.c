@@ -47,7 +47,7 @@ void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct arr
     pipe(argument->pipe);
     argument->function = function;
     argument->args = args;
-    argument->buf = new_transfer(buf, argument->pipe[0], argument->pipe[1]);
+    argument->buf = buffer_new_transfer(buf, argument->pipe[0], argument->pipe[1]);
     pthread_create(&thread, 0, (void* (*)(void*))thread_reader2, argument);
     pthread_detach(thread);
 }

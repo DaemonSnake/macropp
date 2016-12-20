@@ -1,7 +1,7 @@
 #include "inc.h"
 #include <stdarg.h>
 
-buffer new(int in, int out)
+buffer buffer_new(int in, int out)
 {
     buffer this = malloc(sizeof(struct buffer));
 
@@ -18,7 +18,7 @@ buffer new(int in, int out)
     return this;
 }
 
-buffer new_string(char *str, int out)
+buffer buffer_new_string(char *str, int out)
 {
     buffer this = malloc(sizeof(struct buffer));
 
@@ -35,9 +35,9 @@ buffer new_string(char *str, int out)
     return this;
 }
 
-buffer new_transfer(buffer this, int new_in, int out)
+buffer buffer_new_transfer(buffer this, int new_in, int out)
 {
-    buffer tmp = new_string($.data, out);
+    buffer tmp = buffer_new_string($.data, out);
 
     if (!this)
         return NULL;
