@@ -19,7 +19,7 @@ char *tmp = "[@ YOLO @] {}";
 [@COUNTER VALUE @, YOLO @]
 [@STRLEN "YOLO\n" @]
 [@STRLEN NULL @]
-[@FORMAT "\n#define % %\n" @, U bitch @, 42 @]
+[@FORMAT "\n#define % %\n" @, UBTC @, 42 @]
 
 //Nested test
 [@ %NL #define LOL %NL @]
