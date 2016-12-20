@@ -295,8 +295,10 @@ void handle_arguments(buffer buf)
     arg = pop_argument(&args, 0);
     handler = find_handler(arg);
     free(arg);
-    if (!handler)
+    if (!handler) {
         free_arguments(&args);
+        return ;
+    }
     if (handler->allow_spawn)
         spawn_command(buf, handler->handler, args);
     else

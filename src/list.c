@@ -224,7 +224,9 @@ char *list_get_item(size_t hash, unsigned index)
 
 void list_parse_parenth(size_t hash, char *value)
 {
-    (void)hash;
+    //args: "(list, test, yolo)"
+    //[@LIST @, PARSE ARGS @, () @]
+    list_clear(hash);
     (void)value;
 }
 
@@ -232,6 +234,8 @@ void list_clear(size_t hash)
 {
     struct list_node *node = find_list_node(hash);
 
+    if (node == NULL)
+        return ;
     remove_empty_node(node);
     for (struct list_node_item *it = node->front, *next = NULL;
          it != NULL; it = next) {

@@ -86,7 +86,8 @@ void proccess_found(buffer this, bool finished, char *after)
     if ($.index >= $.size)
     {
         $.input_index += $.size;
-        write($.out, $.data, $.size);
+        if ($.out != -1)
+            write($.out, $.data, $.size);
         free($.data);
         $.data = NULL;
         $.index = 0;
@@ -98,7 +99,8 @@ void proccess_found(buffer this, bool finished, char *after)
         return ;
     }
     $.input_index += $.index;
-    write($.out, $.data, $.index);
+    if ($.out != -1)
+        write($.out, $.data, $.index);
     memmove($.data, $.data + $.index, $.size - $.index);
     $.size -= $.index;
     $.data[$.size] = '\0';
@@ -162,7 +164,8 @@ void print_strs(buffer this, ...)
     while ((str = va_arg(ap, char *)) != NULL) {
         len = strlen(str);
         this->input_index += len;
-        write(this->out, str, len);
+        if ($.out != -1)
+            write(this->out, str, len);
     }
     va_end(ap);
 }
@@ -175,6 +178,7 @@ void print_size(buffer this, size_t i)
     asprintf(&number, "%lu", i);
     len = strlen(number);
     this->input_index += len;
-    write(this->out, number, len);
+    if ($.out != -1)
+        write(this->out, number, len);
     free(number);
 }
