@@ -73,11 +73,10 @@ static void create_macro(size_t id, char *text)
 
 static char *eval_macro(char *value, bool eval)
 {
-    (void)eval;
-    /* if (eval) */
-    /* { */
-    /* } */
-    return strdup(value);
+    value = strdup(value);
+    if (!eval)
+        return value;
+    return eval_string_command(value);
 }
 
 void expand_macro(buffer this, char *name)
@@ -95,8 +94,8 @@ static bool is_empty(char *str)
 {
     for (;str && *str; ++str)
         if (*str != ' ' && *str != '\t' && *str != '\n')
-            return true;
-    return false;
+            return false;
+    return true;
 }
 
 void update_macro(char *name, char *value, bool eval)

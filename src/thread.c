@@ -51,3 +51,30 @@ void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct arr
     pthread_create(&thread, 0, (void* (*)(void*))thread_reader2, argument);
     pthread_detach(thread);
 }
+
+static void *eval_string_routine(buffer this)
+{
+    while (look_for(this, "[@", NULL, true, PROCCESS))
+        handle_arguments(this);
+    close(this->out);
+    delete(this);
+    return NULL;
+}
+
+char *eval_string_command(char *str)
+{
+    int fd[2];
+    buffer out;
+    pthread_t thread;
+    char buff[2048];
+    char *result = NULL;
+    int len = 0;
+
+    pipe(fd);
+    out = buffer_new_string(str, fd[1]);
+    pthread_create(&thread, 0, (void*)eval_string_routine, out);
+    while ((len = read(fd[0], buff, 2048)) > 0)
+        result = append_string_n(result, buff, len);
+    close(fd[0]);
+    return result;
+}
