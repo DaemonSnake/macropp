@@ -252,6 +252,45 @@ NEW_HANDLE(list)
     return ret;
 }
 
+NEW_HANDLE(system)
+{
+    int fd[2];
+    char tmp_buffer[2048];
+    int len;
+
+    if (pipe(fd) == -1) {
+        CLEAN();
+        return false;
+    }
+    switch (fork())
+    {
+    case -1:
+        close(fd[0]);
+        close(fd[1]);
+        return false;
+    case 0:
+        dup2(fd[1], 1);
+        close(fd[0]);
+        close(fd[1]);
+        args.data = realloc(args.data, sizeof(char *) * (args.size + 1));
+        args.data[args.size] = NULL;
+        execvp(args.data[1], &args.data[1]);
+        CLEAN();
+        exit(0);
+    default:
+        close(fd[1]);
+        CLEAN();
+        while ((len = read(fd[0], tmp_buffer, 2048)) > 0)
+        {
+            buf->input_index += len;
+            write(buf->out, tmp_buffer, len);
+        }
+        close(fd[0]);
+        break;
+    }
+    return true;
+}
+
 static const struct handler_s handlers[] = {
     {"LOOK_SW", 7, handle_l_swallow, true},
     {"LOOK", 4, handle_look, true},
@@ -262,7 +301,8 @@ static const struct handler_s handlers[] = {
     {"FORMAT", 6, handle_format, true},
     {"MACRO_EVAL", 10, handle_macro_eval, false},
     {"MACRO", 5, handle_macro, false},
-    {"LIST", 4, handle_list, false}
+    {"LIST", 4, handle_list, false},
+    {"SYSTEM", 6, handle_system, false}
 };
 
 static const struct handler_s default_handler = { NULL, 0, handle_default, true };
