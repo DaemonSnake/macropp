@@ -8,16 +8,13 @@ TODO
      -> @SWITCH
                 // the first that matches is the one selected
                 // [@SWITCH [@LOOK ; @, @, [@MACRO class_prototype @] @] @, [@ [@MACRO end_class @] @] @]
-
--make look behave as follows:
-     -> [@LOOK MOTIF @, AFTER @, BEFORE [@, ALT]* @]
-                          where ALT is an alternative before reading
+     -> @MACRO_OP IFDEF
 
 -format: allow numbers after '%' to specify what argument to read
 
 ISSUES:
         -macro name should allow string as names
-        -Transfer buffer back once finished instead of writing it all (look.c)
 
 INTEROGATIONS:
         -handle '\377' and 'xFF' for format
+        -Transfer buffer back once finished instead of writing it all (look.c)
