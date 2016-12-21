@@ -175,29 +175,19 @@ NEW_HANDLE(format)
 
 NEW_HANDLE(macro)
 {
-    char *name RAII = GET(0),
-        *value RAII = GET(1);
-
+    char *name RAII = GET(0);
+    
     CLEAN();
     if (!is_identifier(name))
         return false;
-    if (value)
-        update_macro(name, value, false);
-    else
-        expand_macro(buf, name);
+    expand_macro(buf, name);
     return true;
 }
 
-NEW_HANDLE(macro_eval)
+NEW_HANDLE(macro_op)
 {
-    char *name RAII = GET(0),
-        *value RAII = GET(1);
-
-    CLEAN();
-    if (!is_identifier(name))
-        return false;
     (void)buf;
-    update_macro(name, value, true);
+    macro_handling(args);
     return true;
 }
 
@@ -299,10 +289,10 @@ static const struct handler_s handlers[] = {
     {"COUNTER", 7, handle_counter, false},
     {"STRLEN", 6, handle_strlen, false},
     {"FORMAT", 6, handle_format, true},
-    {"MACRO_EVAL", 10, handle_macro_eval, false},
+    {"MACRO_OP", 8, handle_macro_op, false},
     {"MACRO", 5, handle_macro, false},
     {"LIST", 4, handle_list, false},
-    {"SYSTEM", 6, handle_system, false}
+    {"SYSTEM", 6, handle_system, false},
 };
 
 static const struct handler_s default_handler = { NULL, 0, handle_default, true };

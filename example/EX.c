@@ -1,12 +1,12 @@
-#define class(name, parent)                     \
-    typedef struct name name;                   \
-    [@MACRO CLASS @, name @]                    \
-    [@MACRO SUPER @, parent @]                  \
+#define class(name, parent)                       \
+    typedef struct name name;                     \
+    [@MACRO_OP SET @, CLASS @, name @]            \
+    [@MACRO_OP SET @, SUPER @, parent @]          \
     struct name [@ end_class @]
 
 #define method                                  \
     [@ %CLOSE @]                                \
-    [@MACRO METHOD @,
+    [@MACRO_OP SET METHOD @,
 
 char *tmp = "[@ YOLO @] {}";
 
@@ -29,11 +29,11 @@ char *tmp = "[@ YOLO @] {}";
 //Macro test
 
 [@MACRO CLASS @]
-[@MACRO CLASS @, String @]
+[@MACRO_OP SET @, CLASS @, String @]
 [@MACRO CLASS @]
-[@MACRO CLASS @, @]
+[@MACRO_OP UNDEF @, CLASS @]
 [@MACRO CLASS @]
-[@MACRO CLASS @, Hello @]
+[@MACRO_OP SET @, CLASS @, Hello @]
 [@MACRO CLASS @]
 
 //class tests

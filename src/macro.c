@@ -90,23 +90,10 @@ void expand_macro(buffer this, char *name)
     write(this->out, it->text, it->size);
 }
 
-static bool is_empty(char *str)
+static void update_macro(size_t hash, struct macro_node *it, char *value, bool eval)
 {
-    for (;str && *str; ++str)
-        if (*str != ' ' && *str != '\t' && *str != '\n')
-            return false;
-    return true;
-}
-
-void update_macro(char *name, char *value, bool eval)
-{
-    size_t hash = hash_string(name);
-    struct macro_node *it = find_macro(hash);
-
     if (!it)
         create_macro(hash, eval_macro(value, eval));
-    else if (is_empty(value))
-        remove_macro(it);
     else
     {
         value = eval_macro(value, eval);
@@ -114,6 +101,25 @@ void update_macro(char *name, char *value, bool eval)
         it->text = value;
         it->size = strlen(value);
     }
+}
+
+#define GET(i) pop_argument(&args, i + 1)
+#define CLEAN() free_arguments(&args)
+
+void macro_handling(struct array args)
+{
+    char *op RAII = GET(0),
+        *name RAII = GET(1);
+    size_t hash = hash_string(name);
+    struct macro_node *it = find_macro(hash);
+
+    if (strcmp(op, "UNDEF") == 0)
+        remove_macro(it);
+    else if (strcmp(op, "SET") == 0)
+        update_macro(hash, it, GET(2), false);
+    else if (strcmp(op, "EVAL") == 0)
+        update_macro(hash, it, GET(2), true);
+    CLEAN();
 }
 
 __attribute__((destructor))

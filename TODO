@@ -4,7 +4,6 @@ TODO
      -> @FUNCTION //@foreach, @args, @if, @else, @elseif etc...
      -> @CALL
      -> @EVAL //math
-     -> @LIST //push_back, front, pop_front, pop_back, etc...
      -> @PUSH_RULE and @SEEK
      -> @SWITCH
                 // the first that matches is the one selected
