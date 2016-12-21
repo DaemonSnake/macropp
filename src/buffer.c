@@ -111,7 +111,6 @@ void proccess_found(buffer this, bool finished, char *after)
     }
 }
 
-
 void discard(buffer this)
 {
     if ($.size == 0)
@@ -138,7 +137,7 @@ void __read(buffer this)
         return ;
     if ($.data == NULL) {
         $.data = malloc(SIZE + 1);
-        bzero($.data, SIZE + 1);
+        *$.data = '\0';
     }
     if ($.in == -1) {
         $.stream_finished = true;
