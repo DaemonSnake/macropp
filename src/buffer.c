@@ -88,8 +88,7 @@ void proccess_found(buffer this, bool finished, char *after)
         $.input_index += $.size;
         if ($.out != -1)
             write($.out, $.data, $.size);
-        free($.data);
-        $.data = NULL;
+        *$.data = '\0';
         $.index = 0;
         $.size = 0;
         if (finished) {
@@ -117,8 +116,7 @@ void discard(buffer this)
         return ;
     if ($.index >= $.size)
     {
-        free($.data);
-        $.data = NULL;
+        *$.data = '\0';
         $.index = 0;
         $.size = 0;
         return ;

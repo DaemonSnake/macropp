@@ -29,7 +29,7 @@
 #include <pthread.h>
 
 #define $ (*this)
-#define SIZE 2048
+#define SIZE 1048576
 #define FREE(front, args...) free_all(front, ##args, 0)
 #define RAII __attribute__((cleanup(free_ptr)))
 #define IN_STR "[@"
