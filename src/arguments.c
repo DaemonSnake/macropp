@@ -20,13 +20,6 @@
  * THE SOFTWARE.
  */
 #include "inc.h"
-#define IN_STR "[@"
-#define OUT_STR " @]"
-#define SEP_STR " @, "
-
-#define IN_STR_SIZE 2
-#define OUT_STR_SIZE 3
-#define SEP_STR_SIZE 4
 
 static int count_substr(char *haystack, char *needle)
 {
@@ -163,30 +156,24 @@ static char *dup_argument(char *arg, size_t size)
     return (*arg ? append_string(res, arg) : res);
 }
 
-/* void dump_args(char **result, unsigned size) */
-/* { */
-/*     printf("\n[ARGS:\n"); */
-/*     for (unsigned i = 0; i < size; i++) */
-/*         printf("\t%d: '%s'\n", i, result[i]); */
-/*     printf("]\n"); */
-/*     fflush(stdout); */
-/* } */
-
 bool fill_argument_list_from_string(char *arg_list, struct array *res)
 {
     char *tmp = NULL;
     char *end = NULL;
     unsigned i = 0, size = 8;
 
-    if (!res || !arg_list || !(tmp = index(arg_list, ' ')))
+    if (!res || !arg_list)
         return false;
     free(res->data);
     res->size = 1;
     res->data = calloc(sizeof(char *), size);
+    for (tmp = arg_list; *tmp != ' ' && *tmp != '\t' && *tmp != '\n' && *tmp != 0;
+         tmp++);
     res->data[i++] = strndup(arg_list, tmp - arg_list);
     arg_list = tmp + 1;
-    while ((tmp = get_end_of_argument(arg_list, false, &end)))
+    while ((tmp = skip_seperator(get_end_of_argument(arg_list, false, &end))))
     {
+        end = skip_seperator_end(tmp, end - 1);
         if (i >= size)
             res->data = realloc(res->data, (size += 8) * sizeof(char *));
         res->data[i++] = dup_argument(arg_list, end - arg_list);

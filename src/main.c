@@ -8,7 +8,7 @@ void loop(int in, int out)
 {
     buffer buf = buffer_new(in, out);
 
-    while (look_for(buf, "[@", NULL, true, PROCCESS))
+    while (look_for(buf, IN_STR, NULL, true, PROCCESS))
         handle_arguments(buf);
     delete(buf);
 }

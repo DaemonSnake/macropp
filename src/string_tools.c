@@ -157,3 +157,39 @@ void unchar_string(char *str)
     *tmp = '\0';
     memmove(str, begin, tmp - begin);
 }
+
+bool number_in_string(double number, char *str, size_t size)
+{
+    char *origin = str;
+    
+    for (char *sep = index(str, ','); str > (char *)0x1 && str < origin + size; )
+    {
+        char *dotdot = strstr(str, "..");
+        double val = atof(str);
+
+        if (number == val)
+            return true;
+        if (dotdot && (sep == NULL || dotdot < sep))
+        {
+            double end = atof(dotdot + 2);
+            if (number > val && number <= end)
+                return true;
+        }
+        str = sep + 1;
+        sep = (str > (char *)0x1 ? index(str, ',') : NULL);
+    }
+    return false;
+}
+
+char *skip_seperator_end(char *begin, char *end)
+{
+    for (; end > begin && (*end == ' ' || *end == '\t' || *end == '\n'); end--);
+    return end;
+}
+
+char *skip_seperator(char *begin)
+{
+    if (!begin) return NULL;
+    for (; *begin && (*begin == ' ' || *begin == '\t' || *begin == '\n'); begin++);
+    return begin;
+}

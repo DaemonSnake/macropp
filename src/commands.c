@@ -257,6 +257,7 @@ NEW_HANDLE(system)
     case -1:
         close(fd[0]);
         close(fd[1]);
+        CLEAN();
         return false;
     case 0:
         dup2(fd[1], 1);
@@ -281,6 +282,36 @@ NEW_HANDLE(system)
     return true;
 }
 
+NEW_HANDLE(switch)
+{
+    (void)buf, (void)args;
+    char *value_unparse RAII = GET(0),
+        *sep = index(value_unparse, ':');
+    bool is_numb = (sep && strncmp(value_unparse, "number", sep++ - value_unparse) == 0);
+    double number;
+    char *text = value_unparse;
+
+    if (is_numb)
+        number = atof(sep);
+    for (size_t i = 1; i < args.size - 1; i++)
+    {
+        char *value_unparse RAII = GET(i),
+            *value = index(value_unparse, ':');
+        size_t diff = value - value_unparse;
+
+        if (!value) continue;
+        if ((is_numb && number_in_string(number, value_unparse, diff)) ||
+            (!is_numb && strncmp(value_unparse, text, diff) == 0) ||
+            (diff == 7 && strncmp(value_unparse, "default", diff) == 0)) {
+            print_strs(buf, value + 1, NULL);
+            CLEAN();
+            return true;
+        }
+    }
+    CLEAN();
+    return false;
+}
+
 static const struct handler_s handlers[] = {
     {"LOOK_SW", 7, handle_l_swallow, true},
     {"LOOK", 4, handle_look, true},
@@ -293,6 +324,7 @@ static const struct handler_s handlers[] = {
     {"MACRO", 5, handle_macro, false},
     {"LIST", 4, handle_list, false},
     {"SYSTEM", 6, handle_system, false},
+    {"SWITCH", 6, handle_switch, true}
 };
 
 static const struct handler_s default_handler = { NULL, 0, handle_default, true };

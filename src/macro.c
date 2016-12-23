@@ -103,23 +103,21 @@ static void update_macro(size_t hash, struct macro_node *it, char *value, bool e
     }
 }
 
-#define GET(i) pop_argument(&args, i + 1)
-#define CLEAN() free_arguments(&args)
-
 void macro_handling(struct array args)
 {
     char *op RAII = GET(0),
-        *name RAII = GET(1);
+        *name RAII = GET(1),
+        *opt RAII = GET(2);
     size_t hash = hash_string(name);
     struct macro_node *it = find_macro(hash);
 
+    CLEAN();
     if (strcmp(op, "UNDEF") == 0)
         remove_macro(it);
     else if (strcmp(op, "SET") == 0)
-        update_macro(hash, it, GET(2), false);
+        update_macro(hash, it, opt, false);
     else if (strcmp(op, "EVAL") == 0)
-        update_macro(hash, it, GET(2), true);
-    CLEAN();
+        update_macro(hash, it, opt, true);
 }
 
 __attribute__((destructor))

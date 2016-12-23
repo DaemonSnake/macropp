@@ -32,6 +32,15 @@
 #define SIZE 2048
 #define FREE(front, args...) free_all(front, ##args, 0)
 #define RAII __attribute__((cleanup(free_ptr)))
+#define IN_STR "[@"
+#define OUT_STR "@]"
+#define SEP_STR "@,"
+#define IN_STR_SIZE 2
+#define OUT_STR_SIZE 2
+#define SEP_STR_SIZE 2
+#define GET(i) pop_argument(&args, i + 1)
+#define CLEAN() free_arguments(&args)
+#define NEW_HANDLE(name) bool handle_ ## name(buffer buf, struct array args)
 
 typedef enum { false = 0, true } bool;
 typedef enum { PROCCESS, COPY } action_type;
@@ -102,3 +111,7 @@ char *list_get_item(size_t hash, unsigned index);
 void list_parse_parenth(size_t hash, char *value);
 void list_clear(size_t hash);
 char *eval_string_command(char *str);
+char *skip_seperator(char *str);
+bool number_in_string(double number, char *str, size_t size);
+char *skip_seperator_end(char *begin, char *end);
+char *skip_seperator(char *begin);
