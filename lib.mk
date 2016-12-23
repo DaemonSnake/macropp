@@ -18,34 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-%.o: %.c
-	cpp $< $(CFLAGS) | ../postfix | cpp $(CFLAGS) | cpp $(CFLAGS) | \
-	gcc -c -x c $(CFLAGS) -o $@ /dev/stdin;
+SRC =		src/look.c		\
+		src/tools.c		\
+		src/buffer.c		\
+		src/string_tools.c	\
+		src/commands.c		\
+		src/arguments.c		\
+		src/macro.c		\
+		src/thread.c		\
+		src/list.c
 
-SRC = 	src/object.c	\
-	src/Object.c	\
-	String.c	\
-	main.c		\
+OBJ =		$(SRC:.c=.o)
+CFLAGS +=	-W -Wall -Wextra -Iinc -g3 -pthread -fPIC
+LDFLAGS +=	-shared
+NAME =		libmacro++.so
 
-OBJ= 	$(SRC:.c=.o)
-
-CFLAGS += -fplan9-extensions -W -Wall -Wextra
-
-all:	main
-
-../postfix:
-	$(MAKE) -C ../
-
-main:	../postfix $(OBJ)
-	gcc $(CFLAGS) $(LDFLAGS) $(OBJ) -o $@;
-
-out:
-	@cpp test.c $(CFLAGS) | cpp $(CFLAGS) | cpp $(CFLAGS) | grep -v '#'
+$(NAME):	$(OBJ)
+		gcc $(OBJ) -o $@ $(CFLAGS) $(LDFLAGS)
 
 clean:
-	rm -f $(OBJ)
+		rm -f $(OBJ)
 
-fclean: clean
-	rm -f main
+fclean:		clean
+		rm -f $(NAME)
 
-re: fclean main
+re: 		fclean $(NAME)

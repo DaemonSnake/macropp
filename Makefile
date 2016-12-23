@@ -18,28 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-SRC =		src/main.c		\
-		src/look.c		\
-		src/tools.c		\
-		src/buffer.c		\
-		src/string_tools.c	\
-		src/commands.c		\
-		src/arguments.c		\
-		src/macro.c		\
-		src/thread.c		\
-		src/list.c
-
+SRC =		src/main.c
 MALLOC_TRACE =	.leaks
-
 export MALLOC_TRACE
-
 OBJ =		$(SRC:.c=.o)
-
 CFLAGS =	-W -Wall -Wextra -Iinc -g3 -pthread
-
+LDFLAGS =	-Wl,-rpath=$(CURDIR) -L$(CURDIR) -lmacro++
 NAME =		postfix
 
-$(NAME):	$(OBJ)
+all:		$(NAME)
+
+libmacro++.so:
+		$(MAKE) -f lib.mk
+
+$(NAME):	libmacro++.so $(OBJ)
 		gcc $(OBJ) -o $@ $(CFLAGS) $(LDFLAGS)
 
 test:		$(NAME)
@@ -60,6 +52,7 @@ clean:
 		rm -f $(OBJ)
 
 fclean:		clean
+		$(MAKE) -f lib.mk fclean
 		rm -f $(NAME)
 
 re: 		fclean $(NAME)
