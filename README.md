@@ -6,7 +6,7 @@ When feeding macro++ some text it will look for the following motif :</br>
 The grammar is the following:
 ```ebnf
 <COMMAND> ::= {"[@" COMMAND_NAME {ANYTHING {" @, " ANYTHING}* }? }
-<COMMAND_NAME> ::= {"" | "BALENCED" | "BALENCED_SW" | "LOOK" | "LOOK_SW" | "MACRO" | "MACRO_OP" | "COUNTER" | "FORMAT" | "STRLEN" | "SYSTEM" }
+<COMMAND_NAME> ::= {"" | "BALENCED" | "BALENCED_SW" | "LOOK" | "LOOK_SW" | "MACRO" | "MACRO_OP" | "COUNTER" | "FORMAT" | "STRLEN" | "SYSTEM" | "SWITCH" }
 ```
 <p>This motif is called a command.</br>
 Macro++ will not output the motif and instead generate some text at the
