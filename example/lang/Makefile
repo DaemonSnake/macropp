@@ -18,8 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-%.o: %.c
-	cpp $< $(CFLAGS) | ../macro++ | cpp $(CFLAGS) | cpp $(CFLAGS) | \
+all:	main
+
+%.o: %.c ../../macro++
+	cpp $< $(CFLAGS) | ../../macro++ | cpp $(CFLAGS) | cpp $(CFLAGS) | \
 	gcc -c -x c $(CFLAGS) -o $@ /dev/stdin;
 
 SRC = 	src/object.c	\
@@ -31,12 +33,10 @@ OBJ= 	$(SRC:.c=.o)
 
 CFLAGS += -fplan9-extensions -W -Wall -Wextra
 
-all:	main
+../../macro++:
+	$(MAKE) -C ../../
 
-../macro++:
-	$(MAKE) -C ../
-
-main:	../macro++ $(OBJ)
+main:	$(OBJ)
 	gcc $(CFLAGS) $(LDFLAGS) $(OBJ) -o $@;
 
 out:
