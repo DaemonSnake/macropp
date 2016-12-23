@@ -4,21 +4,11 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-void loop(int in, int out)
+static bool find_in_out(int ac, char **av, int *in_ptr, int *out_ptr)
 {
-    buffer buf = buffer_new(in, out);
-
-    while (look_for(buf, IN_STR, NULL, true, PROCCESS))
-        handle_arguments(buf);
-    delete(buf);
-}
-
-int main(int ac, char **av)
-{
-    int in = 0, out = 1;
     bool in_open = false, out_open = false;
-
-    /* mtrace(); */
+    int in = *in_ptr, out = *out_ptr;
+    
     for (int i = 1; i < ac; )
     {
         if (!out_open && strcmp(av[i], "-o") == 0) {
@@ -47,8 +37,24 @@ int main(int ac, char **av)
             close(in);
         if (out_open)
             close(out);
-        return 42;
+        return false;
     }
-    loop(in, out);
+    *in_ptr = in;
+    *out_ptr = out;
+    return true;
+}
+
+int main(int ac, char **av)
+{
+    int in = 0, out = 1;
+    buffer buf;
+
+    /* mtrace(); */
+    if (!find_in_out(ac, av, &in, &out))
+        return 42;
+    buf = buffer_new(in, out);
+    while (look_for(buf, IN_STR, NULL, true, PROCCESS))
+        handle_arguments(buf);
+    delete(buf);
     return 0;
 }
