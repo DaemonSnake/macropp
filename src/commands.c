@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "inc.h"
+#include "macro++.h"
 
 #define GET(i) pop_argument(&args, i + 1)
 #define CLEAN() free_arguments(&args)

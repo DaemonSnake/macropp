@@ -1,4 +1,4 @@
-#include "inc.h"
+#include "macro++.h"
 #include <stdarg.h>
 
 buffer buffer_new(int in, int out)

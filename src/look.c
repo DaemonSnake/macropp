@@ -1,4 +1,4 @@
-#include "inc.h"
+#include "macro++.h"
 #include "look.h"
 
 char *look_for(buffer this, char *motif, char *before, bool swallow, action_type type)

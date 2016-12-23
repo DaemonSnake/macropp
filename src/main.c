@@ -1,5 +1,5 @@
 #define _GNU_SOURCE
-#include "inc.h"
+#include "macro++.h"
 #include <mcheck.h>
 #include <sys/stat.h>
 #include <fcntl.h>
