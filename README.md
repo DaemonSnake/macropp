@@ -1,5 +1,5 @@
-# postfix, a Unix/GNU command-line macro-system
-When feeding postfix some text it will look for the following motif :</br>
+# macro++, a Unix/GNU command-line macro-system
+When feeding macro++ some text it will look for the following motif :</br>
 ```c
 [@COMMAND_NAME ARG_0 @, ARG_1 @, ... @]
 ```
@@ -9,7 +9,7 @@ The grammar is the following:
 <COMMAND_NAME> ::= {"" | "BALENCED" | "BALENCED_SW" | "LOOK" | "LOOK_SW" | "MACRO" | "MACRO_OP" | "COUNTER" | "FORMAT" | "STRLEN" | "SYSTEM" }
 ```
 <p>This motif is called a command.</br>
-Postfix will not output the motif and instead generate some text at the
+Macro++ will not output the motif and instead generate some text at the
 place the command requires it.</p>
 <p>Commands can be chained and won't match each other, they also can be
 nested meaning a command argument can be an other command. In such cases

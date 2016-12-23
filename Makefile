@@ -24,7 +24,7 @@ export MALLOC_TRACE
 OBJ =		$(SRC:.c=.o)
 CFLAGS =	-W -Wall -Wextra -Iinc -g3 -pthread
 LDFLAGS =	-Wl,-rpath=$(CURDIR) -L$(CURDIR) -lmacro++
-NAME =		postfix
+NAME =		macro++
 
 all:		$(NAME)
 

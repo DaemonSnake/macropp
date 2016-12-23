@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 
 %.o: %.c
-	cpp $< $(CFLAGS) | ../postfix | cpp $(CFLAGS) | cpp $(CFLAGS) | \
+	cpp $< $(CFLAGS) | ../macro++ | cpp $(CFLAGS) | cpp $(CFLAGS) | \
 	gcc -c -x c $(CFLAGS) -o $@ /dev/stdin;
 
 SRC = 	src/object.c	\
@@ -33,10 +33,10 @@ CFLAGS += -fplan9-extensions -W -Wall -Wextra
 
 all:	main
 
-../postfix:
+../macro++:
 	$(MAKE) -C ../
 
-main:	../postfix $(OBJ)
+main:	../macro++ $(OBJ)
 	gcc $(CFLAGS) $(LDFLAGS) $(OBJ) -o $@;
 
 out:
