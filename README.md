@@ -5,7 +5,7 @@ When feeding macro++ some text it will look for the following motif :</br>
 ```
 The grammar is the following:
 ```ebnf
-<COMMAND> ::= {"[@" COMMAND_NAME {ANYTHING {" @, " ANYTHING}* }? }
+<COMMAND> ::= {"[@" COMMAND_NAME {ANYTHING {"@," ANYTHING}* }? "@]" }
 <COMMAND_NAME> ::= {"" | "BALENCED" | "BALENCED_SW" | "LOOK" | "LOOK_SW" | "MACRO" | "MACRO_OP" | "COUNTER" | "FORMAT" | "STRLEN" | "SYSTEM" | "SWITCH" }
 ```
 <p>This motif is called a command.</br>
