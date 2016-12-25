@@ -225,7 +225,7 @@ char *list_get_item(size_t hash, unsigned index)
 void list_parse_parenth(size_t hash, char *value)
 {
     //args: "(list, test, yolo)"
-    //[@LIST @, PARSE ARGS @, () @]
+    //[@LIST PARSE @, ARGS @, () @]
     list_clear(hash);
     (void)value;
 }

@@ -302,7 +302,7 @@ NEW_HANDLE(switch)
         if (!value) continue;
         if ((is_numb && number_in_string(number, value_unparse, diff)) ||
             (!is_numb && strncmp(value_unparse, text, diff) == 0) ||
-            (diff == 7 && strncmp(value_unparse, "default", diff) == 0)) {
+            (diff == 7 && strncmp(value_unparse, "@default", diff) == 0)) {
             print_strs(buf, value + 1, NULL);
             CLEAN();
             return true;
