@@ -48,15 +48,17 @@ buffer buffer_new_string(char *str, int out)
     $.next = NULL;
     $.input_index = 0;
     $.funcs = &vtable_instance;
+    $.alternative = NULL;
     return this;
 }
 
 buffer buffer_new_transfer(buffer this, int new_in, int out)
 {
-    buffer tmp = buffer_new_string($.data, out);
+    buffer tmp;
 
     if (!this)
         return NULL;
+    tmp = buffer_new_string($.data, out);
     tmp->in = $.in;
     tmp->index = $.index;
     tmp->next = $.next;

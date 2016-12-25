@@ -181,8 +181,9 @@ bool fill_argument_list_from_string(char *arg_list, struct array *res)
             break;
         arg_list = tmp;
     }
-    res->data = realloc(res->data, i * sizeof(char *));
+    res->data = realloc(res->data, (i + 1) * sizeof(char *));
     res->size = i;
+    res->data[res->size] = NULL;
     return true;
 }
 

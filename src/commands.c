@@ -22,6 +22,7 @@
 #include "macro++.h"
 
 #define GET(i) pop_argument(&args, i + 1)
+#define ARGS_SIZE (args.size - 1)
 #define CLEAN() free_arguments(&args)
 #define NEW_HANDLE(name) bool handle_ ## name(buffer buf, struct array args)
 
@@ -201,7 +202,7 @@ NEW_HANDLE(list)
     }
     else if (strcmp(subc, "REMOVE") == 0)
     {
-        for (unsigned i = 2; i < args.size - 1; i++)
+        for (unsigned i = 2; i < ARGS_SIZE; i++)
         {
             char *index_str RAII = GET(i);
             int value = atoi(index_str);
@@ -248,8 +249,6 @@ NEW_HANDLE(system)
         dup2(fd[1], 1);
         close(fd[0]);
         close(fd[1]);
-        args.data = realloc(args.data, sizeof(char *) * (args.size + 1));
-        args.data[args.size] = NULL;
         execvp(args.data[1], &args.data[1]);
         CLEAN();
         exit(0);
@@ -277,7 +276,7 @@ NEW_HANDLE(switch)
 
     if (is_numb)
         number = atof(sep);
-    for (size_t i = 1; i < args.size - 1; i++)
+    for (size_t i = 1; i < ARGS_SIZE; i++)
     {
         char *value_unparse RAII = GET(i),
             *value = index(value_unparse, ':');
