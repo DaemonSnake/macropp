@@ -57,10 +57,10 @@ static bool argument_list_is_ok(char *result)
 
 static char *copy_argument_list(buffer this)
 {
-    char *result = look_for(this, OUT_STR, NULL, false, COPY);
+    char *result = look_for(this, OUT_STR, NULL, NULL, false, COPY);
     
     while (!argument_list_is_ok(result)) {
-        char *tmp = look_for(this, OUT_STR, NULL, false, COPY);
+        char *tmp = look_for(this, OUT_STR, NULL, NULL, false, COPY);
         if (!tmp)
             break ;
         result = append_string(result, tmp);

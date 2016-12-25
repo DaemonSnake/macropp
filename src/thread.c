@@ -33,7 +33,7 @@ static void *thread_reader2(data *this)
 {
     $.function($.buf, $.args);
     $.buf->index = $.buf->size;
-    proccess($.buf);
+    $m(this->buf, process);
     close($.pipe[1]);
     free(this);
     return NULL;
@@ -54,10 +54,10 @@ void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct arr
 
 static void *eval_string_routine(buffer this)
 {
-    while (look_for(this, IN_STR, NULL, true, PROCCESS))
+    while (look_for(this, IN_STR, NULL, NULL, true, PROCCESS))
         handle_arguments(this);
     close(this->out);
-    delete(this);
+    $this(delete);
     return NULL;
 }
 

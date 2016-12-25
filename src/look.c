@@ -1,7 +1,8 @@
 #include "macro++.h"
 #include "look.h"
 
-char *look_for(buffer this, char *motif, char *before, bool swallow, action_type type)
+char *look_for(buffer this, char *motif, char *before, char *after,
+               bool swallow, action_type type)
 {
     int motif_len = strlen(motif);
     char *result = 0, *found = 0;
@@ -16,19 +17,19 @@ char *look_for(buffer this, char *motif, char *before, bool swallow, action_type
         if (!found) {
             $.index = $.size - motif_len;
             ACTION(0);
-            __read(this);
+            $this(read);
             continue ;
         }
         $.index = found - $.data;
         ACTION(before);
         $.index += motif_len;
-        (swallow ? discard(this) : ACTION(0));
+        (swallow ? $this(discard) : ACTION(0));
         END_OK;
     }
     END_KO;
 }
 
-char *balanced_look_for(buffer this, char motif, char cancel, char *before,
+char *balanced_look_for(buffer this, char motif, char cancel, char *before, char *after,
                         bool swallow, action_type type)
 {
     char *result = 0, *in = 0, *out = 0;
@@ -54,7 +55,7 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before,
             ACTION(before);
             if (swallow) {
                 $.index++;
-                discard(this);
+                $this(discard);
                 depth = 1;
             }
         }
@@ -75,7 +76,7 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before,
             ACTION(0);
             if (swallow) {
                 $.index++;
-                discard(this);
+                $this(discard);
             }
             END_OK;
         }
@@ -101,10 +102,10 @@ static void action(buffer this, action_type type, char **result, char *before)
     if (type == COPY) {
         *result = append_string(append_string_n(*result, $.data, $.index),
                              before);
-        discard(this);
+        $this(discard);
     }
     else if (type == PROCCESS) {
-        proccess_found(this, (before != NULL), before);
+        $this(proccess_found, (before != NULL), before);
         *result = (void*)0x42;
     }
 }

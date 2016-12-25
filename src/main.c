@@ -53,8 +53,8 @@ int main(int ac, char **av)
     if (!find_in_out(ac, av, &in, &out))
         return 42;
     buf = buffer_new(in, out);
-    while (look_for(buf, IN_STR, NULL, true, PROCCESS))
+    while (look_for(buf, IN_STR, NULL, NULL, true, PROCCESS))
         handle_arguments(buf);
-    delete(buf);
+    $m(buf, delete);
     return 0;
 }

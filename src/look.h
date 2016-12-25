@@ -35,12 +35,12 @@ static void action(buffer this, action_type type, char **result, char *before);
     if ($.index >= $.size || $.size == 0)       \
     {                                           \
         ACTION(0);                              \
-        __read(this);                           \
+        $this(read);                            \
         continue;                               \
     }
 
-#define END_OK                                  \
-    return result;
+#define END_OK                                          \
+    return (print_strs(this, after, NULL), result)
 
 #define END_KO                                          \
     {                                                   \

@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <pthread.h>
 
+#define $m(arg, func, args...) arg->funcs->func(arg, ##args)
+#define $this(func, args...) this->funcs->func(this, ##args)
 #define $ (*this)
 #define SIZE 1048576
 #define FREE(front, args...) free_all(front, ##args, 0)
@@ -55,6 +57,16 @@ struct buffer
     bool stream_finished;
     buffer next;
     size_t input_index;
+    const struct buffer_vtable *funcs;
+};
+
+struct buffer_vtable
+{
+    void (*delete)(buffer this);
+    void (*process)(buffer this);
+    void (*proccess_found)(buffer this, bool finished, char *after);
+    void (*discard)(buffer this);
+    void (*read)(buffer this);
 };
 
 struct array
@@ -63,44 +75,32 @@ struct array
     unsigned size;
 };
 
+//BUFFER
 buffer buffer_new(int in, int out);
 buffer buffer_new_string(char *str, int out);
 buffer buffer_new_transfer(buffer this, int new_in, int out);
-void delete(buffer this);
-void exit_(buffer this);
-void proccess(buffer this);
-void proccess_found(buffer this, bool finished, char *after);
-void discard(buffer this);
-void __read(buffer this);
-char *look_for(buffer this, char *motif, char *before, bool swallow, action_type type);
-char *balanced_look_for(buffer this, char motif, char cancel,
-                        char *before, bool swallow, action_type type);
-void rec_postfix(buffer buf);
-void update_index(buffer this, int index);
+
+char *look_for(buffer this, char *motif, char *before, char *after, bool swallow, action_type type);
+char *balanced_look_for(buffer this, char motif, char cancel, char *before, char *after, bool swallow, action_type type);
 void handle_arguments(buffer buf);
 char *get_argument(char *arg_list, int index);
 void free_all(void *, ...);
 void raii_free(void *);
-int string_index(char *motif, ...);
-int int_index(char *str, char car);
-char *replace_special_characters(char *str);
 void print_size(buffer this, size_t i);
 void print_strs(buffer this, ...);
 void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct array);
 void free_ptr(void *);
-char *index_without_escape(char *str, char c);
-char *min_str(char *, char *);
-char *append_string(char *or, char *new_end);
-char *append_string_n(char *or, char *new_end, int size_end);
 bool fill_argument_list(buffer this, struct array *res);
 void free_arguments(struct array *);
 char *pop_argument(struct array *arg, unsigned index);
-size_t hash_string(char *);
+bool fill_argument_list_from_string(char *arg_list, struct array *res);
+char *eval_string_command(char *str);
+
+//MACRO
 void expand_macro(buffer, char *);
 void macro_handling(struct array);
-bool is_identifier(char *str);
-void unchar_string(char *str);
-bool fill_argument_list_from_string(char *arg_list, struct array *res);
+
+//LIST
 void list_push_back(size_t, char *);
 void list_push_front(size_t, char *);
 void print_list_id(buffer, size_t, char *);
@@ -110,8 +110,18 @@ void list_remove_item(size_t hash, unsigned index);
 char *list_get_item(size_t hash, unsigned index);
 void list_parse_parenth(size_t hash, char *value);
 void list_clear(size_t hash);
-char *eval_string_command(char *str);
-char *skip_seperator(char *str);
+
+//STRING TOOLS
+char *min_str(char *, char *);
+int string_index(char *motif, ...);
+int int_index(char *str, char car);
+char *replace_special_characters(char *str);
+char *index_without_escape(char *str, char c);
+char *append_string(char *or, char *new_end);
+char *append_string_n(char *or, char *new_end, int size_end);
+size_t hash_string(char *);
+bool is_identifier(char *str);
+void unchar_string(char *str);
 bool number_in_string(double number, char *str, size_t size);
 char *skip_seperator_end(char *begin, char *end);
 char *skip_seperator(char *begin);

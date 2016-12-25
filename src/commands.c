@@ -40,10 +40,7 @@ NEW_HANDLE(default)
         *before RAII = GET(1);
 
     CLEAN();
-    if (!balanced_look_for(buf, '{', '}', before, false, PROCCESS))
-        return false;
-    print_strs(buf, after, 0);
-    return true;
+    return (balanced_look_for(buf, '{', '}', before, after, false, PROCCESS) != NULL);
 }
 
 NEW_HANDLE(look)
@@ -53,10 +50,7 @@ NEW_HANDLE(look)
         *before RAII = GET(2);
 
     CLEAN();
-    if (!look_for(buf, motif, before, false, PROCCESS))
-        return false;
-    print_strs(buf, after, 0);
-    return true;
+    return (look_for(buf, motif, before, after, false, PROCCESS) != NULL);
 }
 
 NEW_HANDLE(l_swallow)
@@ -66,10 +60,7 @@ NEW_HANDLE(l_swallow)
         *before RAII = GET(2);
 
     CLEAN();
-    if (!look_for(buf, motif, before, true, PROCCESS))
-        return false;
-    print_strs(buf, after, 0);
-    return true;
+    return (look_for(buf, motif, before, after, true, PROCCESS) != NULL);
 }
 
 NEW_HANDLE(balenced)
@@ -87,10 +78,7 @@ NEW_HANDLE(balenced)
         return false;
     in = in_tmp[0];
     out = out_tmp[0];
-    if (!balanced_look_for(buf, in, out, before, false, PROCCESS))
-        return false;
-    print_strs(buf, after, 0);
-    return true;
+    return (balanced_look_for(buf, in, out, before, after, false, PROCCESS) != NULL);
 }
 
 NEW_HANDLE(b_swallow)
@@ -108,10 +96,7 @@ NEW_HANDLE(b_swallow)
         return false;
     in = in_tmp[0];
     out = out_tmp[0];
-    if (!balanced_look_for(buf, in, out, before, true, PROCCESS))
-        return false;
-    print_strs(buf, after, 0);
-    return true;
+    return (balanced_look_for(buf, in, out, before, after, true, PROCCESS) != NULL);
 }
 
 NEW_HANDLE(counter)
