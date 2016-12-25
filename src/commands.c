@@ -269,7 +269,6 @@ NEW_HANDLE(system)
 
 NEW_HANDLE(switch)
 {
-    (void)buf, (void)args;
     char *value_unparse RAII = GET(0),
         *sep = index(value_unparse, ':');
     bool is_numb = (sep && strncmp(value_unparse, "number", sep++ - value_unparse) == 0);
