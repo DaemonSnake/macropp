@@ -31,7 +31,7 @@
 #define $m(arg, func, args...) arg->funcs->func(arg, ##args)
 #define $this(func, args...) this->funcs->func(this, ##args)
 #define $ (*this)
-#define SIZE 1048576
+#define SIZE 262144
 #define FREE(front, args...) free_all(front, ##args, 0)
 #define RAII __attribute__((cleanup(free_ptr)))
 #define IN_STR "[@"
