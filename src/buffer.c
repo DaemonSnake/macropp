@@ -48,7 +48,6 @@ buffer buffer_new_string(char *str, int out)
     $.next = NULL;
     $.input_index = 0;
     $.funcs = &vtable_instance;
-    $.alternative = NULL;
     return this;
 }
 
@@ -96,19 +95,7 @@ static void proccess_found(buffer this, bool finished, char *after)
     if ($.size == 0)
         return ;
     if ($.index >= $.size)
-    {
-        $.input_index += $.size;
-        if ($.out != -1)
-            write($.out, $.data, $.size);
-        *$.data = '\0';
-        $.index = 0;
-        $.size = 0;
-        if (finished) {
-            print_strs(this, after, 0);
-            //alt
-        }
-        return ;
-    }
+        $.index = $.size;
     $.input_index += $.index;
     if ($.out != -1)
         write($.out, $.data, $.index);
