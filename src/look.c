@@ -11,18 +11,18 @@ char *look_for(buffer this, char *motif, char *before, char *after,
     while (!$.stream_finished)
     {
         NEW_READ;
-        found = strstr($.data + $.index, motif);
+        found = strstr($.data + $.read_index, motif);
         if (!ignore_literals(this, &in_literal, found))
             continue;
         if (!found) {
-            $.index = $.size - motif_len;
+            $.read_index = $.size - motif_len;
             ACTION(0);
             $this(read);
             continue ;
         }
-        $.index = found - $.data;
+        $.read_index = found - $.data;
         ACTION(before);
-        $.index += motif_len;
+        $.read_index += motif_len;
         (swallow ? $this(discard) : ACTION(0));
         END_OK;
     }
@@ -43,39 +43,39 @@ char *balanced_look_for(buffer this, char motif, char cancel, char *before, char
 
         if (!started)
         {
-            in = index($.data + $.index, motif);
+            in = index($.data + $.read_index, motif);
             if (!ignore_literals(this, &in_literal, in))
                 continue ;
             if (!(in)) {
-                $.index = $.size;
+                $.read_index = $.size;
                 continue ;
             }
-            $.index = in - $.data;
+            $.read_index = in - $.data;
             started = true;
             ACTION(before);
             if (swallow) {
-                $.index++;
+                $.read_index++;
                 $this(discard);
                 depth = 1;
             }
         }
 
-        out = min_str(index($.data + $.index, motif),
-                      index($.data + $.index, cancel));
+        out = min_str(index($.data + $.read_index, motif),
+                      index($.data + $.read_index, cancel));
         if (!ignore_literals(this, &in_literal, out))
             continue ;
         if (!out) {
-            $.index = $.size;
+            $.read_index = $.size;
             continue ;
         }
 
-        $.index = out - $.data + 1;
+        $.read_index = out - $.data + 1;
         if (*out == cancel && --depth == 0)
         {
-            $.index = out - $.data + (swallow ? 0 : 1);
+            $.read_index = out - $.data + (swallow ? 0 : 1);
             ACTION(0);
             if (swallow) {
-                $.index++;
+                $.read_index++;
                 $this(discard);
             }
             END_OK;
@@ -97,10 +97,10 @@ static void action(buffer this, action_type type, char **result, char *before)
 {
     if ($.size == 0)
         return ;
-    $.index = ($.index < 0 ? 0 :
-               ($.index > $.size ? $.size : $.index));
+    $.read_index = ($.read_index < 0 ? 0 :
+               ($.read_index > $.size ? $.size : $.read_index));
     if (type == COPY) {
-        *result = append_string(append_string_n(*result, $.data, $.index),
+        *result = append_string(append_string_n(*result, $.data, $.read_index),
                              before);
         $this(discard);
     }
@@ -112,8 +112,8 @@ static void action(buffer this, action_type type, char **result, char *before)
 
 static bool ignore_literals(buffer this, trilean *in_literal, char *found)
 {
-    char *index_str = index_inf($.data + $.index, '"', found),
-        *index_char = index_inf($.data + $.index, '\'', found);
+    char *index_str = index_inf($.data + $.read_index, '"', found),
+        *index_char = index_inf($.data + $.read_index, '\'', found);
 
     if (*in_literal) {
         bool is_str = (*in_literal == a_true);
@@ -123,10 +123,10 @@ static bool ignore_literals(buffer this, trilean *in_literal, char *found)
                     NULL);
 
         if (out == NULL) {
-            $.index = $.size;
+            $.read_index = $.size;
             return false;
         }
-        $.index = out - $.data + 1;
+        $.read_index = out - $.data + 1;
         if (out > found)
             return false;
         index_str = (index_str <= out ? NULL: index_str);
@@ -135,8 +135,8 @@ static bool ignore_literals(buffer this, trilean *in_literal, char *found)
     }
 
     for (; index_str || index_char;
-         index_str = index_inf($.data + $.index, '"', found),
-         index_char = index_inf($.data + $.index, '\'', found))
+         index_str = index_inf($.data + $.read_index, '"', found),
+         index_char = index_inf($.data + $.read_index, '\'', found))
     {
         char *min = min_str(index_str, index_char),
             symb = (min == index_str ? '"' : '\''),
@@ -145,10 +145,10 @@ static bool ignore_literals(buffer this, trilean *in_literal, char *found)
 
         if (out == NULL) {
             *in_literal = (symb == '"' ? a_true : b_true);
-            $.index = $.size;
+            $.read_index = $.size;
             return false;
         }
-        $.index = out - $.data + 1;
+        $.read_index = out - $.data + 1;
 
         if (out > found)
             return false;
@@ -156,10 +156,10 @@ static bool ignore_literals(buffer this, trilean *in_literal, char *found)
             continue ;
 
         if (!(out = index(max + 1, symb))) {
-            $.index = $.size;
+            $.read_index = $.size;
             return false;
         }
-        $.index = out - $.data;
+        $.read_index = out - $.data;
         if (out > found)
             return false;
     }

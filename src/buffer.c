@@ -23,7 +23,7 @@ buffer buffer_new(int in, int out)
         return NULL;
     $.data = NULL;
     $.size = 0;
-    $.index = 0;
+    $.read_index = 0;
     $.in = in;
     $.out = out;
     $.stream_finished = false;
@@ -41,7 +41,7 @@ buffer buffer_new_string(char *str, int out)
         return NULL;
     $.data = str;
     $.size = (str == NULL ? 0 : strlen(str));
-    $.index = 0;
+    $.read_index = 0;
     $.in = -1;
     $.out = out;
     $.stream_finished = false;
@@ -59,14 +59,14 @@ buffer buffer_new_transfer(buffer this, int new_in, int out)
         return NULL;
     tmp = buffer_new_string($.data, out);
     tmp->in = $.in;
-    tmp->index = $.index;
+    tmp->read_index = $.read_index;
     tmp->next = $.next;
     tmp->input_index = $.input_index;
     $.in = new_in;
     $.data = 0;
     $.size = 0;
     $.stream_finished = false;
-    $.index = 0;
+    $.read_index = 0;
     $.next = tmp;
     return tmp;
 }
@@ -94,15 +94,15 @@ static void proccess_found(buffer this, bool finished, char *after)
 {
     if ($.size == 0)
         return ;
-    if ($.index >= $.size)
-        $.index = $.size;
-    $.input_index += $.index;
+    if ($.read_index >= $.size)
+        $.read_index = $.size;
+    $.input_index += $.read_index;
     if ($.out != -1)
-        write($.out, $.data, $.index);
-    memmove($.data, $.data + $.index, $.size - $.index);
-    $.size -= $.index;
+        write($.out, $.data, $.read_index);
+    memmove($.data, $.data + $.read_index, $.size - $.read_index);
+    $.size -= $.read_index;
     $.data[$.size] = '\0';
-    $.index = 0;
+    $.read_index = 0;
     if (finished) {
         print_strs(this, after, 0);
         //alt
@@ -113,17 +113,17 @@ static void discard(buffer this)
 {
     if ($.size == 0)
         return ;
-    if ($.index >= $.size)
+    if ($.read_index >= $.size)
     {
         *$.data = '\0';
-        $.index = 0;
+        $.read_index = 0;
         $.size = 0;
         return ;
     }
-    memmove($.data, $.data + $.index, $.size - $.index);
-    $.size -= $.index;
+    memmove($.data, $.data + $.read_index, $.size - $.read_index);
+    $.size -= $.read_index;
     $.data[$.size] = '\0';
-    $.index = 0;
+    $.read_index = 0;
 }
 
 static void buffer_read(buffer this)

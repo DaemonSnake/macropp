@@ -32,7 +32,7 @@ static void action(buffer this, action_type type, char **result, char *before);
 #define ACTION(x...) action(this, type, &result, x)
 
 #define NEW_READ                                \
-    if ($.index >= $.size || $.size == 0)       \
+    if ($.read_index >= $.size || $.size == 0)  \
     {                                           \
         ACTION(0);                              \
         $this(read);                            \
@@ -42,18 +42,18 @@ static void action(buffer this, action_type type, char **result, char *before);
 #define END_OK                                          \
     return (print_strs(this, after, NULL), result)
 
-#define END_KO                                          \
-    {                                                   \
-        if (result && type == COPY)                     \
-        {                                               \
-            print_strs(this, result, NULL);             \
-            free(result);                               \
-        }                                               \
-        if ($.data)                                     \
-        {                                               \
-            print_strs(this, $.data + $.index, NULL);   \
-            free($.data);                               \
-            $.data = NULL;                              \
-        }                                               \
-        return 0;                                       \
+#define END_KO                                                  \
+    {                                                           \
+        if (result && type == COPY)                             \
+        {                                                       \
+            print_strs(this, result, NULL);                     \
+            free(result);                                       \
+        }                                                       \
+        if ($.data)                                             \
+        {                                                       \
+            print_strs(this, $.data + $.read_index, NULL);      \
+            free($.data);                                       \
+            $.data = NULL;                                      \
+        }                                                       \
+        return 0;                                               \
     }

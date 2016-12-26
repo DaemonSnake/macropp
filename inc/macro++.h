@@ -52,7 +52,7 @@ struct buffer
 {
     char *data;
     int size;
-    int index;
+    int read_index;
     int in, out;
     bool stream_finished;
     buffer next;

@@ -32,7 +32,7 @@ typedef struct
 static void *thread_reader2(data *this)
 {
     $.function($.buf, $.args);
-    $.buf->index = $.buf->size;
+    $.buf->read_index = $.buf->size;
     $m(this->buf, process);
     close($.pipe[1]);
     free(this);
