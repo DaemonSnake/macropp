@@ -58,21 +58,19 @@ char *replace_special_characters(char *str)
 {
     char *read = str;
     char *write = str;
+    int i;
 
     if (str == NULL)
         return NULL;
     for (write = str; *read != '\0'; read++, write++)
     {
-        if (*read == '\\' && read[1] != '\0')
+        if (*read == '\\' && read[1] != '\0' &&
+            (i = int_index("abfnrtv'\"\\", read[1])) != -1)
         {
-            int i = int_index("abfnrtv'\"", read[1]);
-            if (i == -1)
-                goto no_backslash;
-            *write = "\a\b\f\n\r\t\v'\""[i];
+            *write = "\a\b\f\n\r\t\v'\"\\"[i];
             read++;
         }
         else if (read != write)
-        no_backslash:
             *write = *read;
     }
     *write = '\0';
