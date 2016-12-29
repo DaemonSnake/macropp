@@ -1,22 +1,4 @@
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <dlfcn.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-#define str(args...) #args
-
-struct function
-{
-    pid_t pid;
-    char *name;
-    char *libname;
-    void *handle;
-    void (*func)();
-};
+#include "inc.h"
 
 struct function create_function(char *name, char *code)
 {
@@ -75,11 +57,4 @@ void delete_function(struct function *func)
     bzero(func, sizeof(struct function));
 }
 
-int main()
-{
-    struct function tmp = create_function(strdup("test"), str({
-                printf("Yolo\n");
-            }));
-    call_function(&tmp);
-    delete_function(&tmp);
-}
+int i = 0;
