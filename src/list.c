@@ -256,6 +256,22 @@ void list_clear(size_t hash)
     free(node);
 }
 
+void list_eval(size_t hash, int index)
+{
+    struct list_node *node = find_list_node(hash);
+    int i = 0;
+
+    if (node == NULL)
+        return ;
+    for (struct list_node_item *it = node->front, *next = NULL;
+         it != NULL; it = next) {
+        next = it->next;
+        if (index == -1 || index == i)
+            it->text = eval_string_command(it->text);
+        i++;
+    }
+}
+
 __attribute__((destructor))
 static void clear_all_lists()
 {

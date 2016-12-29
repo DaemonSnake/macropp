@@ -222,6 +222,8 @@ NEW_HANDLE(list)
     }
     else if (strcmp(subc, "CLEAR") == 0)
         list_clear(hash);
+    else if (strcmp(subc, "EVAL") == 0)
+        list_eval(hash);
     else
         ret = false;
     CLEAN();

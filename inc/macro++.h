@@ -110,6 +110,7 @@ void list_remove_item(size_t hash, unsigned index);
 char *list_get_item(size_t hash, unsigned index);
 void list_parse_parenth(size_t hash, char *value);
 void list_clear(size_t hash);
+void list_eval(size_t hash, int index);
 
 //STRING TOOLS
 char *min_str(char *, char *);
