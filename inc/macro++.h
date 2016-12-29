@@ -125,3 +125,4 @@ void unchar_string(char *str);
 bool number_in_string(double number, char *str, size_t size);
 char *skip_seperator_end(char *begin, char *end);
 char *skip_seperator(char *begin);
+char *get_end_of_argument(char *list, bool rec, char **end, char *motifs[3]);

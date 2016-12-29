@@ -75,9 +75,9 @@ static int min_str_3(char *_0, char *_1, char *_2)
             (min_str(_1, _2) == _1 ? 1 : 2));
 }
 
-static char *get_end_of_argument(char *list, bool rec, char **end)
+char *get_end_of_argument(char *list, bool rec, char **end, char *motifs[3])
 {
-    char *motifs[3] = {IN_STR, OUT_STR, SEP_STR};
+    /* char *motifs[3] = {IN_STR, OUT_STR, SEP_STR}; */
     enum { IN = 0, OUT = 1, SEP = 2 };
     char *result[3];
     char *char_begin = NULL, *str_begin = NULL;
@@ -111,7 +111,7 @@ static char *get_end_of_argument(char *list, bool rec, char **end)
         result[min] += size;
         if (min == IN)
         {
-            list = get_end_of_argument(result[min], true, NULL);
+            list = get_end_of_argument(result[min], true, NULL, motifs);
             continue ;
         }
         if (end)
@@ -161,6 +161,7 @@ bool fill_argument_list_from_string(char *arg_list, struct array *res)
     char *tmp = NULL;
     char *end = NULL;
     unsigned i = 0, size = 8;
+    char *motifs[3] = {IN_STR, OUT_STR, SEP_STR};
 
     if (!res || !arg_list)
         return false;
@@ -171,7 +172,7 @@ bool fill_argument_list_from_string(char *arg_list, struct array *res)
          tmp++);
     res->data[i++] = strndup(arg_list, tmp - arg_list);
     arg_list = tmp + 1;
-    while ((tmp = skip_seperator(get_end_of_argument(arg_list, false, &end))))
+    while ((tmp = skip_seperator(get_end_of_argument(arg_list, false, &end, motifs))))
     {
         end = skip_seperator_end(tmp, end - 1);
         if (i >= size)

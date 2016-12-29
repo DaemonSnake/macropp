@@ -224,10 +224,20 @@ char *list_get_item(size_t hash, unsigned index)
 
 void list_parse_parenth(size_t hash, char *value)
 {
-    //args: "(list, test, yolo)"
-    //[@LIST PARSE @, ARGS @, () @]
+    char *motifs[3] = {"(", ")", ","};
+    char *end = NULL, *next = NULL;
+
     list_clear(hash);
-    (void)value;
+    if ((value = index(value, '(')) == NULL)
+        return ;
+    ++value;
+    while ((next = skip_seperator(get_end_of_argument(value, false, &end, motifs))))
+    {
+        list_push_back(hash, strndup(value, end - value));
+        if (!*next || !*end)
+            break;
+        value = next;
+    }
 }
 
 void list_clear(size_t hash)
