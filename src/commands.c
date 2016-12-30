@@ -222,8 +222,11 @@ NEW_HANDLE(list)
     }
     else if (strcmp(subc, "CLEAR") == 0)
         list_clear(hash);
-    else if (strcmp(subc, "EVAL") == 0)
-        list_eval(hash);
+    else if (strcmp(subc, "EVAL") == 0) {
+        char *index_str RAII = GET(2);
+        int index = atoi(index_str);
+        list_eval(hash, index);
+    }
     else
         ret = false;
     CLEAN();
