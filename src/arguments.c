@@ -125,8 +125,8 @@ char *get_end_of_argument(char *list, bool rec, char **end, char *motifs[3])
 static char *dup_argument(char *arg, size_t size)
 {
     char *res = NULL;;
-    const char *to_rep[] = {"%CLOSE", "%SEP", "%OPEN", "%NL"};
-    const int to_rep_size[] = {6, 4, 5, 3};
+    const char *to_rep[] = {"%CLOSE", "%SEP", "%OPEN:", "%NL"};
+    const int to_rep_size[] = {6, 4, 6, 3};
     const char *with[] = {OUT_STR, SEP_STR, IN_STR, "\n"};
     const int with_size[] = {OUT_STR_SIZE, SEP_STR_SIZE, IN_STR_SIZE, 1};
     char *found[] = {NULL, NULL, NULL, NULL};
