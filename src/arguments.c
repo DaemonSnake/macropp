@@ -77,7 +77,6 @@ static int min_str_3(char *_0, char *_1, char *_2)
 
 char *get_end_of_argument(char *list, bool rec, char **end, char *motifs[3])
 {
-    /* char *motifs[3] = {IN_STR, OUT_STR, SEP_STR}; */
     enum { IN = 0, OUT = 1, SEP = 2 };
     char *result[3];
     char *char_begin = NULL, *str_begin = NULL;
@@ -158,8 +157,8 @@ static char *dup_argument(char *arg, size_t size)
 
 bool fill_argument_list_from_string(char *arg_list, struct array *res)
 {
-    char *tmp = NULL;
-    char *end = NULL;
+    char *next_argument = NULL;
+    char *end = NULL, *end_skip = NULL;
     unsigned i = 0, size = 8;
     char *motifs[3] = {IN_STR, OUT_STR, SEP_STR};
 
@@ -168,19 +167,19 @@ bool fill_argument_list_from_string(char *arg_list, struct array *res)
     free(res->data);
     res->size = 1;
     res->data = calloc(sizeof(char *), size);
-    for (tmp = arg_list; *tmp != ' ' && *tmp != '\t' && *tmp != '\n' && *tmp != 0;
-         tmp++);
-    res->data[i++] = strndup(arg_list, tmp - arg_list);
-    arg_list = tmp + 1;
-    while ((tmp = skip_seperator(get_end_of_argument(arg_list, false, &end, motifs))))
+    for (next_argument = arg_list; *next_argument != ' ' && *next_argument != '\t' && *next_argument != '\n' && *next_argument != 0;
+         next_argument++);
+    res->data[i++] = strndup(arg_list, next_argument - arg_list);
+    arg_list = next_argument + 1;
+    while ((next_argument = skip_seperator(get_end_of_argument(arg_list, false, &end, motifs))))
     {
-        end = skip_seperator_end(tmp, end - 1);
+        end_skip = skip_seperator_end(arg_list, end + (*end == '@' ? -1 : 0));
         if (i >= size)
             res->data = realloc(res->data, (size += 8) * sizeof(char *));
-        res->data[i++] = dup_argument(arg_list, end - arg_list);
-        if (!*tmp || !*end)
+        res->data[i++] = dup_argument(arg_list, end_skip - arg_list + 1);
+        if (!*next_argument || !*end)
             break;
-        arg_list = tmp;
+        arg_list = next_argument;
     }
     res->data = realloc(res->data, (i + 1) * sizeof(char *));
     res->size = i;
