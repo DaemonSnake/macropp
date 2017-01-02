@@ -28,10 +28,10 @@ NAME =		macro++
 
 all:		$(NAME)
 
-libmacro++.so:
-		$(MAKE) -f lib.mk
+library:
+		@(! $(MAKE) -q -f lib.mk && $(MAKE) -f lib.mk) || ! false
 
-$(NAME):	libmacro++.so $(OBJ)
+$(NAME):	library $(OBJ)
 		gcc $(OBJ) -o $@ $(CFLAGS) $(LDFLAGS)
 
 test:		$(NAME)
