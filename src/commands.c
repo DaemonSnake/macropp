@@ -309,7 +309,7 @@ static const struct handler_s handlers[] = {
     {"STRLEN", 6, handle_strlen, false},
     {"FORMAT", 6, handle_format, true},
     {"MACRO_OP", 8, handle_macro_op, false},
-    {"MACRO", 5, handle_macro, false},
+    {"MACRO", 5, handle_macro, true},
     {"LIST", 4, handle_list, false},
     {"SYSTEM", 6, handle_system, false},
     {"SWITCH", 6, handle_switch, true}
