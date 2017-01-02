@@ -9,11 +9,13 @@ TODO
                 // the first that matches is the one selected
                 // [@SWITCH [@LOOK ; @, @, [@MACRO class_prototype @] @] @, [@ [@MACRO end_class @] @] @]
      -> @MACRO_OP IFDEF
+     -> @STRUCT
 
 -format: allow numbers after '%' to specify what argument to read
 
 ISSUES:
         -macro name should allow string as names
+        dup_argument only if the motif is not inside a subargument
 
 INTEROGATIONS:
         -handle '\377' and 'xFF' for format
