@@ -130,27 +130,41 @@ static char *dup_argument(char *arg, size_t size)
     const char *with[] = {OUT_STR, SEP_STR, IN_STR, "\n"};
     const int with_size[] = {OUT_STR_SIZE, SEP_STR_SIZE, IN_STR_SIZE, 1};
     char *found[] = {NULL, NULL, NULL, NULL};
-    unsigned min = 0;
+    char *open = NULL, *close = NULL;
+    int min = 0;
     char tmp[size + 1];
 
     strncpy(tmp, arg, size);
     tmp[size] = '\0';
     arg = tmp;
-    for (unsigned i = 0; i < sizeof(to_rep) / sizeof(to_rep[0]); i++)
+    for (size_t i = 0; i < sizeof(to_rep) / sizeof(to_rep[0]); i++)
         found[i] = strstr(arg, to_rep[i]);
+    open = strstr(arg, IN_STR);
     while (*arg)
     {
-        min = 0;
-        for (unsigned i = 1; i < sizeof(to_rep) / sizeof(to_rep[0]); i++)
-            min = (min_str(found[min], found[i]) == found[i] ? i : min);
-        if (found[min] == NULL)
+        min = -1;
+        for (size_t i = 0; i < sizeof(to_rep) / sizeof(to_rep[0]); i++) {
+            if (found[i] != NULL && (open == NULL || open > found[i]))
+                min = (min == -1 || min_str(found[min], found[i]) == found[i] ? (int)i : min);
+        }
+        if (min != -1 && found[min] != NULL)
+        {
+            res = append_string_n(res, arg, found[min] - arg);
+            res = append_string_n(res, (char *)with[min], with_size[min]);
+            arg = found[min] + to_rep_size[min];
+        }
+        else if (!open || !(close = strstr(open, OUT_STR)))
             break ;
-        res = append_string_n(res, arg, found[min] - arg);
-        res = append_string_n(res, (char *)with[min], with_size[min]);
-        arg = found[min] + to_rep_size[min];
+        else
+        {
+            res = append_string_n(res, arg, close - arg + OUT_STR_SIZE);
+            arg = close + OUT_STR_SIZE;
+        }
         for (unsigned i = 0; i < sizeof(to_rep) / sizeof(to_rep[0]); i++)
             if (found[i] && found[i] < arg)
                 found[i] = strstr(arg, to_rep[i]);
+        if (open != NULL && open < arg)
+            open = strstr(arg, IN_STR);
     }
     return (*arg ? append_string(res, arg) : res);
 }
