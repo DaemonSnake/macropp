@@ -9,21 +9,23 @@ typedef enum {
 #define __MANGLE_1(x, y) __MANGLE_2(x, y)
 #define __MANGLE_2(x, y) x ## __ ## y
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
-#define NEW_SUBCOMMAND(name) bool CMANGLE(name)()
+#define NEW_SUBCOMMAND(name, sub) bool MANGLE(name, sub ## __ ## subcommand)()
+#define __TO_STR_2(name) #name
+#define __TO_STR_1(name) __TO_STR_2(name)
+#define TO_STR(name) __TO_STR_1(name)
+#define FINISH_COMMANDS  static struct handler command_handler[__COUNTER__]
 
 struct handler
 {
-    char *name;
     size_t hash;
     bool is_subcommands, allow_thread;
     union
     {
         bool (*handler)();
-        struct {
-            char *name;
+        struct handler_subcommand {
             size_t hash;
             bool allow_thread;
             bool (*handler)();
-        } sub[];
+        } *sub;
     };
 };
