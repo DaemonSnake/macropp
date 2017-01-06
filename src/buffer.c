@@ -92,7 +92,7 @@ static void proccess(buffer this)
 
 static void proccess_found(buffer this, bool finished, char *after)
 {
-    if ($.size == 0)
+    if ($.size == 0 || $.data == NULL)
         return ;
     if ($.read_index >= $.size)
         $.read_index = $.size;
