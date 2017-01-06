@@ -18,15 +18,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-SRC =		src/look.c		\
-		src/tools.c		\
+SRC =		src/tools.c		\
 		src/buffer.c		\
 		src/string_tools.c	\
 		src/commands.c		\
 		src/arguments.c		\
-		src/macro.c		\
 		src/thread.c		\
-		src/list.c
+					\
+		src/commands/macro.c	\
+		src/commands/look.c	\
+		src/commands/list.c
 
 OBJ =		$(SRC:.c=.o)
 CFLAGS +=	-W -Wall -Wextra -Iinc -g3 -pthread -fPIC
