@@ -43,6 +43,7 @@
 #define GET(i) pop_argument(&args, i + 1)
 #define CLEAN() free_arguments(&args)
 #define NEW_HANDLE(name) bool handle_ ## name(buffer buf, struct array args)
+#define ARRAY_SIZE(x) sizeof(x) / sizeof(x[0])
 
 typedef enum { false = 0, true } bool;
 typedef enum { PROCCESS, COPY } action_type;

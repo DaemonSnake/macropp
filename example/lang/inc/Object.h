@@ -21,11 +21,6 @@
  */
 #pragma once
 
-#include "append.h"
-#include "class.h"
-#include "method.h"
-#include "keywords.h"
-#include "new.h"
 #include "Type.h"
 
 typedef struct Object *Object;

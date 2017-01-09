@@ -328,7 +328,7 @@ const struct handler_s *find_handler(char *arg)
 
     if (size == 0)
         return &default_handler;
-    for (unsigned i = 0; i < (sizeof(handlers) / sizeof(handlers[0])); i++)
+    for (unsigned i = 0; i < ARRAY_SIZE(handlers); i++)
         if (size >= $.size && strncmp(arg, $.motif, $.size) == 0)
             return &$;
     return NULL;

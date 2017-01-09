@@ -137,13 +137,13 @@ static char *dup_argument(char *arg, size_t size)
     strncpy(tmp, arg, size);
     tmp[size] = '\0';
     arg = tmp;
-    for (size_t i = 0; i < sizeof(to_rep) / sizeof(to_rep[0]); i++)
+    for (size_t i = 0; i < ARRAY_SIZE(to_rep); i++)
         found[i] = strstr(arg, to_rep[i]);
     open = strstr(arg, IN_STR);
     while (*arg)
     {
         min = -1;
-        for (size_t i = 0; i < sizeof(to_rep) / sizeof(to_rep[0]); i++) {
+        for (size_t i = 0; i < ARRAY_SIZE(to_rep); i++) {
             if (found[i] != NULL && (open == NULL || open > found[i]))
                 min = (min == -1 || min_str(found[min], found[i]) == found[i] ? (int)i : min);
         }
@@ -160,7 +160,7 @@ static char *dup_argument(char *arg, size_t size)
             res = append_string_n(res, arg, close - arg + OUT_STR_SIZE);
             arg = close + OUT_STR_SIZE;
         }
-        for (unsigned i = 0; i < sizeof(to_rep) / sizeof(to_rep[0]); i++)
+        for (unsigned i = 0; i < ARRAY_SIZE(to_rep); i++)
             if (found[i] && found[i] < arg)
                 found[i] = strstr(arg, to_rep[i]);
         if (open != NULL && open < arg)
