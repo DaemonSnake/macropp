@@ -1,4 +1,4 @@
-bool CMANGLE(command_handle)();
+bool CMANGLE(command_handle)(buffer, struct array);
 static struct handler command_handler[];
 
 #ifndef SUBCOMMANDS
@@ -23,7 +23,7 @@ static void CMANGLE(constructor)()
     command_handler[__COUNTER__] = command_tool;
 }
 
-bool CMANGLE(command_handle)()
+bool CMANGLE(command_handle)(buffer this, struct array args)
 
 #else
 

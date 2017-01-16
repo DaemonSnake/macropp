@@ -4,12 +4,21 @@ typedef enum {
     true
 } bool;
 
+struct array
+{
+    char **data;
+    size_t size;
+};
+
+typedef struct {} buffer;
+
 #define MANGLE(x, y) __MANGLE_1(x, y)
 #define CMANGLE(x) MANGLE(COMMAND, x)
 #define __MANGLE_1(x, y) __MANGLE_2(x, y)
 #define __MANGLE_2(x, y) x ## __ ## y
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
-#define NEW_SUBCOMMAND(name, sub) bool MANGLE(name, sub ## __ ## subcommand)()
+#define NEW_SUBCOMMAND(name, sub)                                       \
+    bool MANGLE(name, sub ## __ ## subcommand)(buffer this, struct array args)
 #define __TO_STR_2(name) #name
 #define __TO_STR_1(name) __TO_STR_2(name)
 #define TO_STR(name) __TO_STR_1(name)
@@ -21,12 +30,12 @@ struct handler
     bool is_subcommands, allow_thread;
     union
     {
-        bool (*handler)();
+        bool (*handler)(buffer, struct array);
         struct {
             struct handler_subcommand {
                 size_t hash;
                 bool allow_thread;
-                bool (*handler)();
+                bool (*handler)(buffer, struct array);
             } *sub;
             size_t size;
         };
