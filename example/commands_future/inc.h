@@ -22,10 +22,13 @@ struct handler
     union
     {
         bool (*handler)();
-        struct handler_subcommand {
-            size_t hash;
-            bool allow_thread;
-            bool (*handler)();
-        } *sub;
+        struct {
+            struct handler_subcommand {
+                size_t hash;
+                bool allow_thread;
+                bool (*handler)();
+            } *sub;
+            size_t size;
+        };
     };
 };
