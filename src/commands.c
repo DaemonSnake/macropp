@@ -21,8 +21,6 @@
  */
 #include "macro++.h"
 
-#define GET(i) pop_argument(&args, i + 1)
-#define ARGS_SIZE (args.size - 1)
 #define CLEAN() free_arguments(&args)
 #define NEW_HANDLE(name) bool handle_ ## name(buffer buf, struct array args)
 
@@ -37,8 +35,8 @@ static const struct handler_s handlers[];
 
 NEW_HANDLE(default)
 {
-    char *after RAII = GET(0),
-        *before RAII = GET(1);
+    char *after RAII = POP(),
+        *before RAII = POP();
 
     CLEAN();
     return (balanced_look_for(buf, '{', '}', before, after, false, PROCCESS) != NULL);
@@ -46,9 +44,9 @@ NEW_HANDLE(default)
 
 NEW_HANDLE(look)
 {
-    char *motif RAII = GET(0),
-        *after RAII = GET(1),
-        *before RAII = GET(2);
+    char *motif RAII = POP(),
+        *after RAII = POP(),
+        *before RAII = POP();
 
     CLEAN();
     return (look_for(buf, motif, before, after, false, PROCCESS) != NULL);
@@ -56,9 +54,9 @@ NEW_HANDLE(look)
 
 NEW_HANDLE(l_swallow)
 {
-    char *motif RAII = GET(0),
-        *after RAII = GET(1),
-        *before RAII = GET(2);
+    char *motif RAII = POP(),
+        *after RAII = POP(),
+        *before RAII = POP();
 
     CLEAN();
     return (look_for(buf, motif, before, after, true, PROCCESS) != NULL);
@@ -66,10 +64,10 @@ NEW_HANDLE(l_swallow)
 
 NEW_HANDLE(balenced)
 {
-    char *in_tmp RAII = GET(0),
-        *out_tmp RAII = GET(1),
-        *after RAII = GET(2),
-        *before RAII = GET(3),
+    char *in_tmp RAII = POP(),
+        *out_tmp RAII = POP(),
+        *after RAII = POP(),
+        *before RAII = POP(),
         in, out;
 
     CLEAN();
@@ -84,10 +82,10 @@ NEW_HANDLE(balenced)
 
 NEW_HANDLE(b_swallow)
 {
-    char *in_tmp RAII = GET(0),
-        *out_tmp RAII = GET(1),
-        *after RAII = GET(2),
-        *before RAII = GET(3),
+    char *in_tmp RAII = POP(),
+        *out_tmp RAII = POP(),
+        *after RAII = POP(),
+        *before RAII = POP(),
         in, out;
 
     CLEAN();
@@ -103,8 +101,8 @@ NEW_HANDLE(b_swallow)
 NEW_HANDLE(counter)
 {
     static size_t i = 0;
-    char *type_str RAII = GET(0),
-        *to_mangle RAII = GET(1);
+    char *type_str RAII = POP(),
+        *to_mangle RAII = POP();
     int type = string_index(type_str, "VALUE", "NEXT", "PREV", NULL);
 
     CLEAN();
@@ -123,7 +121,7 @@ NEW_HANDLE(counter)
 
 NEW_HANDLE(strlen)
 {
-    char *str RAII = replace_special_characters(GET(0));
+    char *str RAII = replace_special_characters(POP());
     char *begin, *end;
 
     CLEAN();
@@ -137,11 +135,10 @@ NEW_HANDLE(strlen)
 
 NEW_HANDLE(format)
 {
-    char *format RAII = replace_special_characters(GET(0)),
+    char *format RAII = replace_special_characters(POP()),
         *end = rindex(format, '"'),
         *it = index(format, '"') + 1,
         *tmp;
-    int i = 0;
 
     while(it > (char *)1)
     {
@@ -149,7 +146,7 @@ NEW_HANDLE(format)
         buf->input_index += (tmp ? tmp: end) - it;
         write(buf->out, it, (tmp ? tmp: end) - it);
         it = tmp;
-        if (it && (tmp = GET(++i)) != NULL) {
+        if (it && (tmp = POP()) != NULL) {
             print_strs(buf, tmp, NULL);
             free(tmp);
         }
@@ -161,7 +158,7 @@ NEW_HANDLE(format)
 
 NEW_HANDLE(macro)
 {
-    char *name RAII = GET(0);
+    char *name RAII = POP();
     
     CLEAN();
     if (!is_identifier(name))
@@ -179,32 +176,32 @@ NEW_HANDLE(macro_op)
 
 NEW_HANDLE(list)
 {
-    char *subc RAII = GET(0),
-        *name RAII = GET(1);
+    char *subc RAII = POP(),
+        *name RAII = POP();
     size_t hash = hash_string(name);
     bool ret = true;
 
     if (strcmp(subc, "PRINT") == 0) {
-        char *sep RAII = GET(2);
+        char *sep RAII = POP();
         print_list_id(buf, hash, (sep ? sep : " "));
     }
     else if (strcmp(subc, "PUSH_BACK") == 0)
-        list_push_back(hash, GET(2));
+        list_push_back(hash, POP());
     else if (strcmp(subc, "PUSH_FRONT") == 0)
-        list_push_front(hash, GET(2));
+        list_push_front(hash, POP());
     else if (strcmp(subc, "POP_BACK") == 0)
         list_pop_back(hash);
     else if (strcmp(subc, "POP_FRONT") == 0)
         list_pop_front(hash);
     else if (strcmp(subc, "PARSE") == 0) {
-        char *value RAII = GET(2);
+        char *value RAII = POP();
         list_parse_parenth(hash, value);
     }
     else if (strcmp(subc, "REMOVE") == 0)
     {
-        for (unsigned i = 2; i < ARGS_SIZE; i++)
+        while (args.size > 0)
         {
-            char *index_str RAII = GET(i);
+            char *index_str RAII = POP();
             int value = atoi(index_str);
             if (value < 0)
                 break;
@@ -213,7 +210,7 @@ NEW_HANDLE(list)
     }
     else if (strcmp(subc, "ITEM") == 0)
     {
-        char *index_str RAII = GET(2);
+        char *index_str RAII = POP();
         int value = atoi(index_str);
         if (value >= 0)
             print_strs(buf, list_get_item(hash, (unsigned)value), NULL);
@@ -223,7 +220,7 @@ NEW_HANDLE(list)
     else if (strcmp(subc, "CLEAR") == 0)
         list_clear(hash);
     else if (strcmp(subc, "EVAL") == 0) {
-        char *index_str RAII = GET(2);
+        char *index_str RAII = POP();
         int index = atoi(index_str);
         list_eval(hash, index);
     }
@@ -273,7 +270,7 @@ NEW_HANDLE(system)
 
 NEW_HANDLE(switch)
 {
-    char *value_unparse RAII = GET(0),
+    char *value_unparse RAII = POP(),
         *sep = index(value_unparse, ':');
     bool is_numb = (sep && strncmp(value_unparse, "number", sep++ - value_unparse) == 0);
     double number;
@@ -281,9 +278,9 @@ NEW_HANDLE(switch)
 
     if (is_numb)
         number = atof(sep);
-    for (size_t i = 1; i < ARGS_SIZE; i++)
+    while (args.size > 0)
     {
-        char *value_unparse RAII = GET(i),
+        char *value_unparse RAII = POP(),
             *value = index(value_unparse, ':');
         size_t diff = value - value_unparse;
 
@@ -336,13 +333,13 @@ const struct handler_s *find_handler(char *arg)
 
 void handle_arguments(buffer buf)
 {
-    struct array args = {NULL, 0};
+    struct array args = {NULL, NULL, 0};
     char *arg;
     const struct handler_s * handler;
 
     if (!fill_argument_list(buf, &args) || args.data == NULL)
         return ;
-    arg = pop_argument(&args, 0);
+    arg = POP();
     handler = find_handler(arg);
     free(arg);
     if (!handler) {

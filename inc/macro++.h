@@ -40,7 +40,7 @@
 #define IN_STR_SIZE 2
 #define OUT_STR_SIZE 2
 #define SEP_STR_SIZE 2
-#define GET(i) pop_argument(&args, i + 1)
+#define POP() pop_front_argument(&args)
 #define CLEAN() free_arguments(&args)
 #define NEW_HANDLE(name) bool handle_ ## name(buffer buf, struct array args)
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(x[0])
@@ -73,6 +73,7 @@ struct buffer_vtable
 struct array
 {
     char **data;
+    char **begin;
     unsigned size;
 };
 
@@ -93,7 +94,7 @@ void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct arr
 void free_ptr(void *);
 bool fill_argument_list(buffer this, struct array *res);
 void free_arguments(struct array *);
-char *pop_argument(struct array *arg, unsigned index);
+char *pop_front_argument(struct array *arg);
 bool fill_argument_list_from_string(char *arg_list, struct array *res);
 char *eval_string_command(char *str);
 

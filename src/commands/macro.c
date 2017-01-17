@@ -105,9 +105,9 @@ static void update_macro(size_t hash, struct macro_node *it, char *value, bool e
 
 void macro_handling(struct array args)
 {
-    char *op RAII = GET(0),
-        *name RAII = GET(1),
-        *opt RAII = GET(2);
+    char *op RAII = POP(),
+        *name RAII = POP(),
+        *opt RAII = POP();
     size_t hash = hash_string(name);
     struct macro_node *it = find_macro(hash);
 

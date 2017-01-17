@@ -198,6 +198,7 @@ bool fill_argument_list_from_string(char *arg_list, struct array *res)
     res->data = realloc(res->data, (i + 1) * sizeof(char *));
     res->size = i;
     res->data[res->size] = NULL;
+    res->begin = res->data;
     return true;
 }
 
@@ -216,18 +217,19 @@ void free_arguments(struct array *arg)
         if (!arg->data[i])
             continue;
         free(arg->data[i]);
-        arg->data[i] = NULL;
     }
-    free(arg->data);
+    free(arg->begin);
     arg->data = NULL;
     arg->size = 0;
+    arg->begin = NULL;
 }
 
-char *pop_argument(struct array *arg, unsigned index)
+char *pop_front_argument(struct array *arg)
 {
-    if (!arg || index >= arg->size)
+    if (!arg || arg->size == 0)
         return NULL;
-    char *tmp = arg->data[index];
-    arg->data[index] = NULL;
+    char *tmp = arg->data[0];
+    arg->data++;
+    arg->size--;
     return tmp;
 }
