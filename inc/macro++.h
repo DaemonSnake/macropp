@@ -81,22 +81,28 @@ struct array
 buffer buffer_new(int in, int out);
 buffer buffer_new_string(char *str, int out);
 buffer buffer_new_transfer(buffer this, int new_in, int out);
+void print_size(buffer this, size_t i);
+void print_strs(buffer this, ...);
 
 char *look_for(buffer this, char *motif, char *before, char *after, bool swallow, action_type type);
 char *balanced_look_for(buffer this, char motif, char cancel, char *before, char *after, bool swallow, action_type type);
+
+//ARGS | ARRAY
 void handle_arguments(buffer buf);
 char *get_argument(char *arg_list, int index);
+bool fill_argument_list(buffer this, struct array *res);
+char *pop_front_argument(struct array *arg);
+void free_arguments(struct array *);
+bool fill_argument_list_from_string(char *arg_list, struct array *res);
+
+//TOOLS
 void free_all(void *, ...);
 void raii_free(void *);
-void print_size(buffer this, size_t i);
-void print_strs(buffer this, ...);
-void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct array);
 void free_ptr(void *);
-bool fill_argument_list(buffer this, struct array *res);
-void free_arguments(struct array *);
-char *pop_front_argument(struct array *arg);
-bool fill_argument_list_from_string(char *arg_list, struct array *res);
+
+//THREADS
 char *eval_string_command(char *str);
+void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct array);
 
 //MACRO
 void expand_macro(buffer, char *);
@@ -129,3 +135,11 @@ bool number_in_string(double number, char *str, size_t size);
 char *skip_seperator_end(char *begin, char *end);
 char *skip_seperator(char *begin);
 char *get_end_of_argument(char *list, bool rec, char **end, char *motifs[3]);
+
+//MACRO_TOOLS
+#define MANGLE(x, y) __MANGLE_1(x, y)
+#define CMANGLE(x) MANGLE(COMMAND, x)
+#define __MANGLE_1(x, y) __MANGLE_2(x, y)
+#define __MANGLE_2(x, y) x ## __ ## y
+#define NEW_SUBCOMMAND(name, sub)                                       \
+    bool MANGLE(name, sub ## __ ## subcommand)(buffer this, struct array args)
