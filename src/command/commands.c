@@ -43,12 +43,12 @@ static bool look_func(buffer this, struct array args, bool swallow)
 }
 
 #define COMMAND LOOK
+#define DISPATCH dispatch(look_func, false)
 #include "create_command.h"
-{ return look_func(this, args, false); }
 
 #define COMMAND L_SWALLOW
+#define DISPATCH dispatch(look_func, true)
 #include "create_command.h"
-{ return look_func(this, args, true); }
 
 static bool balenced_func(buffer this, struct array args, bool swallow)
 {
@@ -69,12 +69,12 @@ static bool balenced_func(buffer this, struct array args, bool swallow)
 }
 
 #define COMMAND BALENCED
+#define DISPATCH dispatch(balenced_func, false)
 #include "create_command.h"
-{ return balenced_func(this, args, false); }
 
 #define COMMAND B_SWALLOW
+#define DISPATCH dispatch(balenced_func, true)
 #include "create_command.h"
-{ return balenced_func(this, args, true); }
 
 #define COMMAND COUNTER
 #define SUBCOMMANDS                                       \

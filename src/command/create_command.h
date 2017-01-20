@@ -32,6 +32,11 @@ static void CMANGLE(constructor)()
 }
 
 bool CMANGLE(command_handle)(buffer this, struct array args)
+# ifdef DISPATCH
+#  define dispatch(NAME, ARGS...) { return NAME(this, args, ##ARGS); }
+     DISPATCH
+#  undef DISPATCH
+# endif
 
 #else
 
