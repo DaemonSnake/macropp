@@ -115,9 +115,8 @@ NEW_SUBCOMMAND(MACRO_OP, UNDEF)
 
 NEW_SUBCOMMAND(MACRO_OP, SET)
 {
-    char *name RAII = POP(),
-        *opt RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
+    char *opt RAII = POP();
     struct macro_node *it = find_macro(hash);
 
     CLEAN();
@@ -127,9 +126,8 @@ NEW_SUBCOMMAND(MACRO_OP, SET)
 
 NEW_SUBCOMMAND(MACRO_OP, EVAL)
 {
-    char *name RAII = POP(),
-        *opt RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
+    char *opt RAII = POP();
     struct macro_node *it = find_macro(hash);
 
     CLEAN();

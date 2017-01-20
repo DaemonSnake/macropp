@@ -40,7 +40,8 @@
 #define IN_STR_SIZE 2
 #define OUT_STR_SIZE 2
 #define SEP_STR_SIZE 2
-#define POP() pop_front_argument(_Generic(args, struct array: &args, struct array *: args))
+#define POP(opt...)                                                     \
+    MANGLE_OPT(pop_front_argument, ##opt)(_Generic(args, struct array: &args, struct array *: args))
 #define CLEAN() free_arguments(_Generic(args, struct array: &args, struct array *: args))
 #define NEW_HANDLE(name) bool handle_ ## name(buffer buf, struct array args)
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(x[0])
@@ -94,6 +95,10 @@ bool fill_argument_list(buffer this, struct array *res);
 char *pop_front_argument(struct array *arg);
 void free_arguments(struct array *);
 bool fill_argument_list_from_string(char *arg_list, struct array *res);
+size_t pop_front_argument_hash(struct array *arg);
+unsigned pop_front_argument_to_uint(struct array *arg);
+int pop_front_argument_to_int(struct array *arg);
+double pop_front_argument_to_double(struct array *arg);
 
 //TOOLS
 void free_all(void *, ...);
@@ -143,3 +148,8 @@ char *get_end_of_argument(char *list, bool rec, char **end, char *motifs[3]);
 #define __MANGLE_2(x, y) x ## __ ## y
 #define NEW_SUBCOMMAND(name, sub)                                       \
     bool MANGLE(name, sub ## __ ## subcommand)(buffer this __attribute__((unused)), struct array args)
+
+#define __MANGLE_DO(x, y) x ## _ ## y
+#define __MANGLE_DONT(x, y) x
+#define __MANGLE_OPT(value, opt, macro, tool...) macro(value, opt)
+#define MANGLE_OPT(value, opt...) __MANGLE_OPT(value, ##opt, __MANGLE_DO, __MANGLE_DONT)

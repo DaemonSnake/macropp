@@ -201,7 +201,7 @@ static bool balenced_func(buffer this, struct array args, bool swallow)
 {
     char *value_unparse RAII = POP(),
         *sep = index(value_unparse, ':');
-    bool is_numb = (sep && strncmp(value_unparse, "number", sep++ - value_unparse) == 0);
+    bool is_numb = (sep++ && strcmp(value_unparse, "number") == 0);
     double number;
     size_t hash = hash_string(value_unparse),
         default_hash = hash_string("@default");

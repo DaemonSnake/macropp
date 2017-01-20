@@ -286,8 +286,7 @@ static void clear_all_lists()
 
 NEW_SUBCOMMAND(LIST, PRINT)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
     char *sep RAII = POP();
 
     CLEAN();
@@ -297,8 +296,7 @@ NEW_SUBCOMMAND(LIST, PRINT)
 
 NEW_SUBCOMMAND(LIST, PUSH_FRONT)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
 
     while (args.size > 0)
         list_push_back(hash, POP());
@@ -308,8 +306,7 @@ NEW_SUBCOMMAND(LIST, PUSH_FRONT)
 
 NEW_SUBCOMMAND(LIST, PUSH_BACK)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
 
     while (args.size > 0)
         list_push_front(hash, POP());
@@ -319,8 +316,7 @@ NEW_SUBCOMMAND(LIST, PUSH_BACK)
 
 NEW_SUBCOMMAND(LIST, POP_FRONT)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
 
     CLEAN();
     list_pop_front(hash);
@@ -329,8 +325,7 @@ NEW_SUBCOMMAND(LIST, POP_FRONT)
 
 NEW_SUBCOMMAND(LIST, POP_BACK)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
 
     CLEAN();
     list_pop_back(hash);
@@ -339,8 +334,7 @@ NEW_SUBCOMMAND(LIST, POP_BACK)
 
 NEW_SUBCOMMAND(LIST, PARSE)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
     char *value RAII = POP();
 
     CLEAN();
@@ -350,13 +344,11 @@ NEW_SUBCOMMAND(LIST, PARSE)
 
 NEW_SUBCOMMAND(LIST, REMOVE)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
 
     while (args.size > 0)
     {
-        char *index_str RAII = POP();
-        int value = atoi(index_str);
+        int value = POP(to_int);
         if (value < 0)
             break;
         list_remove_item(hash, (unsigned)value);
@@ -367,10 +359,8 @@ NEW_SUBCOMMAND(LIST, REMOVE)
 
 NEW_SUBCOMMAND(LIST, ITEM)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
-    char *index_str RAII = POP();
-    int value = atoi(index_str);
+    size_t hash = POP(hash);
+    int value = POP(to_int);
 
     CLEAN();
     if (value < 0)
@@ -381,8 +371,7 @@ NEW_SUBCOMMAND(LIST, ITEM)
 
 NEW_SUBCOMMAND(LIST, CLEAR)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
+    size_t hash = POP(hash);
 
     CLEAN();
     list_clear(hash);
@@ -391,10 +380,8 @@ NEW_SUBCOMMAND(LIST, CLEAR)
 
 NEW_SUBCOMMAND(LIST, EVAL)
 {
-    char *name RAII = POP();
-    size_t hash = hash_string(name);
-    char *index_str RAII = POP();
-    int index = atoi(index_str);
+    size_t hash = POP(hash);
+    int index = POP(to_int);
 
     CLEAN();
     if (index < 0)
