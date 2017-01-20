@@ -113,18 +113,6 @@ void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct arr
 void expand_macro(buffer, char *);
 void macro_handling(struct array);
 
-//LIST
-void list_push_back(size_t, char *);
-void list_push_front(size_t, char *);
-void print_list_id(buffer, size_t, char *);
-void list_pop_front(size_t hash);
-void list_pop_back(size_t hash);
-void list_remove_item(size_t hash, unsigned index);
-char *list_get_item(size_t hash, unsigned index);
-void list_parse_parenth(size_t hash, char *value);
-void list_clear(size_t hash);
-void list_eval(size_t hash, int index);
-
 //STRING TOOLS
 char *min_str(char *, char *);
 int string_index(char *motif, ...);
