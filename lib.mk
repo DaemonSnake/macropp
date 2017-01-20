@@ -27,7 +27,8 @@ SRC =		src/tools.c			\
 						\
 		src/command/commands/macro.c	\
 		src/command/commands/look.c	\
-		src/command/commands/list.c
+		src/command/commands/list.c	\
+		src/command/commands/counter.c
 
 OBJ =		$(SRC:.c=.o)
 CFLAGS +=	-W -Wall -Wextra -Iinc -g3 -pthread -fPIC

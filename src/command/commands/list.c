@@ -283,3 +283,122 @@ static void clear_all_lists()
     list.front = NULL;
     list.back = NULL;
 }
+
+NEW_SUBCOMMAND(LIST, PRINT)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+    char *sep RAII = POP();
+
+    CLEAN();
+    print_list_id(this, hash, (sep ? sep : " "));
+    return true;
+}
+
+NEW_SUBCOMMAND(LIST, PUSH_FRONT)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+
+    while (args.size > 0)
+        list_push_back(hash, POP());
+    CLEAN();
+    return true;
+}
+
+NEW_SUBCOMMAND(LIST, PUSH_BACK)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+
+    while (args.size > 0)
+        list_push_front(hash, POP());
+    CLEAN();
+    return true;
+}
+
+NEW_SUBCOMMAND(LIST, POP_FRONT)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+
+    CLEAN();
+    list_pop_front(hash);
+    return true;
+}
+
+NEW_SUBCOMMAND(LIST, POP_BACK)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+
+    CLEAN();
+    list_pop_back(hash);
+    return true;
+}
+
+NEW_SUBCOMMAND(LIST, PARSE)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+    char *value RAII = POP();
+
+    CLEAN();
+    list_parse_parenth(hash, value);
+    return true;
+}
+
+NEW_SUBCOMMAND(LIST, REMOVE)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+
+    while (args.size > 0)
+    {
+        char *index_str RAII = POP();
+        int value = atoi(index_str);
+        if (value < 0)
+            break;
+        list_remove_item(hash, (unsigned)value);
+    }
+    CLEAN();
+    return true;
+}
+
+NEW_SUBCOMMAND(LIST, ITEM)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+    char *index_str RAII = POP();
+    int value = atoi(index_str);
+
+    CLEAN();
+    if (value < 0)
+        return false;
+    print_strs(this, list_get_item(hash, (unsigned)value), NULL);
+    return true;
+}
+
+NEW_SUBCOMMAND(LIST, CLEAR)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+
+    CLEAN();
+    list_clear(hash);
+    return true;
+}
+
+NEW_SUBCOMMAND(LIST, EVAL)
+{
+    char *name RAII = POP();
+    size_t hash = hash_string(name);
+    char *index_str RAII = POP();
+    int index = atoi(index_str);
+
+    CLEAN();
+    if (index < 0)
+        return false;
+    list_eval(hash, index);
+    return true;
+}
