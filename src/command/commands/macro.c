@@ -103,21 +103,38 @@ static void update_macro(size_t hash, struct macro_node *it, char *value, bool e
     }
 }
 
-void macro_handling(struct array args)
+NEW_SUBCOMMAND(MACRO_OP, UNDEF)
 {
-    char *op RAII = POP(),
-        *name RAII = POP(),
+    char *name RAII = POP();
+    struct macro_node *it = find_macro(hash_string(name));
+
+    CLEAN();
+    remove_macro(it);
+    return true;
+}
+
+NEW_SUBCOMMAND(MACRO_OP, SET)
+{
+    char *name RAII = POP(),
         *opt RAII = POP();
     size_t hash = hash_string(name);
     struct macro_node *it = find_macro(hash);
 
     CLEAN();
-    if (strcmp(op, "UNDEF") == 0)
-        remove_macro(it);
-    else if (strcmp(op, "SET") == 0)
-        update_macro(hash, it, opt, false);
-    else if (strcmp(op, "EVAL") == 0)
-        update_macro(hash, it, opt, true);
+    update_macro(hash, it, opt, false);
+    return true;
+}
+
+NEW_SUBCOMMAND(MACRO_OP, EVAL)
+{
+    char *name RAII = POP(),
+        *opt RAII = POP();
+    size_t hash = hash_string(name);
+    struct macro_node *it = find_macro(hash);
+
+    CLEAN();
+    update_macro(hash, it, opt, true);
+    return true;
 }
 
 __attribute__((destructor))

@@ -40,8 +40,8 @@
 #define IN_STR_SIZE 2
 #define OUT_STR_SIZE 2
 #define SEP_STR_SIZE 2
-#define POP() pop_front_argument(&args)
-#define CLEAN() free_arguments(&args)
+#define POP() pop_front_argument(_Generic(args, struct array: &args, struct array *: args))
+#define CLEAN() free_arguments(_Generic(args, struct array: &args, struct array *: args))
 #define NEW_HANDLE(name) bool handle_ ## name(buffer buf, struct array args)
 #define ARRAY_SIZE(x) sizeof(x) / sizeof(x[0])
 
@@ -142,4 +142,4 @@ char *get_end_of_argument(char *list, bool rec, char **end, char *motifs[3]);
 #define __MANGLE_1(x, y) __MANGLE_2(x, y)
 #define __MANGLE_2(x, y) x ## __ ## y
 #define NEW_SUBCOMMAND(name, sub)                                       \
-    bool MANGLE(name, sub ## __ ## subcommand)(buffer this, struct array args)
+    bool MANGLE(name, sub ## __ ## subcommand)(buffer this __attribute__((unused)), struct array args)

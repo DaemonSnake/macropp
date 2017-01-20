@@ -1,10 +1,18 @@
-bool CMANGLE(command_handle)(buffer, struct array);
 static struct handler command_handler[];
 
 #ifndef SUBCOMMANDS
 
+# ifdef DEFAULT
+#  define COMMAND DEFAULT
+#  define COMMAND_STR ""
+# else
+#  define COMMAND_STR TO_STR(COMMAND)
+# endif
+
+bool CMANGLE(command_handle)(buffer, struct array);
+
 # ifndef THREADS
-#  define THREADS false
+#  define THREADS true
 # elif THREADS != true
 #  undef THREADS
 #  define THREADS false
@@ -14,7 +22,7 @@ __attribute__((constructor))
 static void CMANGLE(constructor)()
 {
     struct handler command_tool = {
-        .hash = hash_string(TO_STR(COMMAND)),
+        .hash = hash_string(COMMAND_STR),
         .is_subcommands = false,
         .allow_thread = THREADS,
         .handler = CMANGLE(command_handle)
@@ -51,6 +59,8 @@ static void CMANGLE(constructor)()
     command_handler[__COUNTER__] = command_tool;
 }
 
+# undef subcommand
+
 #endif
 
 #ifdef COMMAND
@@ -63,4 +73,12 @@ static void CMANGLE(constructor)()
 
 #ifdef THREADS
 # undef THREADS
+#endif
+
+#ifdef DEFAULT
+# undef DEFAULT
+#endif
+
+#ifdef COMMAND_STR
+# undef COMMAND_STR
 #endif

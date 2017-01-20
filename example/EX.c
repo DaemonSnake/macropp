@@ -6,7 +6,7 @@
 
 #define method                                  \
     [@ %CLOSE @]                                \
-    [@MACRO_OP SET METHOD @,
+    [@MACRO_OP SET @, METHOD @,
 
 char *tmp = "[@ YOLO @] {}";
 
