@@ -54,7 +54,7 @@ void spawn_command(buffer buf, bool(*function)(buffer, struct array), struct arr
 
 static void *eval_string_routine(buffer this)
 {
-    while (look_for(this, IN_STR, NULL, NULL, true, PROCCESS))
+    while (look_for(this, IN_STR, NULL, NULL, true, PROCCESS, NULL))
         handle_arguments(this);
     close(this->out);
     $this(delete);

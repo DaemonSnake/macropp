@@ -87,8 +87,8 @@ buffer buffer_new_transfer(buffer this, int new_in, int out);
 void print_size(buffer this, size_t i);
 void print_strs(buffer this, ...);
 
-char *look_for(buffer this, char *motif, char *before, char *after, bool swallow, action_type type);
-char *balanced_look_for(buffer this, char motif, char cancel, char *before, char *after, bool swallow, action_type type);
+bool look_for(buffer this, char *motif, char *before, char *after, bool swallow, action_type type, char **copy);
+bool balanced_look_for(buffer this, char motif, char cancel, char *before, char *after, bool swallow, action_type type, char **copy);
 
 //ARGS | ARRAY
 void handle_arguments(buffer buf);

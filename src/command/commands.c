@@ -29,7 +29,7 @@
         *before RAII = POP();
 
     CLEAN();
-    return (balanced_look_for(this, '{', '}', before, after, false, PROCCESS) != NULL);
+    return balanced_look_for(this, '{', '}', before, after, false, PROCCESS, NULL);
 }
 
 static bool look_func(buffer this, struct array args, bool swallow)
@@ -39,7 +39,7 @@ static bool look_func(buffer this, struct array args, bool swallow)
         *before RAII = POP();
 
     CLEAN();
-    return (look_for(this, motif, before, after, swallow, PROCCESS) != NULL);
+    return look_for(this, motif, before, after, swallow, PROCCESS, NULL);
 }
 
 #define COMMAND LOOK
@@ -65,7 +65,7 @@ static bool balenced_func(buffer this, struct array args, bool swallow)
         return false;
     in = in_tmp[0];
     out = out_tmp[0];
-    return (balanced_look_for(this, in, out, before, after, swallow, PROCCESS) != NULL);
+    return balanced_look_for(this, in, out, before, after, swallow, PROCCESS, NULL);
 }
 
 #define COMMAND BALENCED

@@ -1,11 +1,11 @@
 #include "macro++.h"
 #include "look.h"
 
-char *look_for(buffer this, char *motif, char *before, char *after,
-               bool swallow, action_type type)
+bool look_for(buffer this, char *motif, char *before, char *after,
+              bool swallow, action_type type, char **copy)
 {
     int motif_len = strlen(motif);
-    char *result = 0, *found = 0;
+    char *found = 0;
     trilean in_literal = ab_false;
 
     while (!$.stream_finished)
@@ -29,10 +29,10 @@ char *look_for(buffer this, char *motif, char *before, char *after,
     END_KO;
 }
 
-char *balanced_look_for(buffer this, char motif, char cancel, char *before, char *after,
-                        bool swallow, action_type type)
+bool balanced_look_for(buffer this, char motif, char cancel, char *before, char *after,
+                       bool swallow, action_type type, char **copy)
 {
-    char *result = 0, *in = 0, *out = 0;
+    char *in = 0, *out = 0;
     int depth = 0;
     bool started = false;
     trilean in_literal = false;
@@ -104,10 +104,8 @@ static void action(buffer this, action_type type, char **result, char *before)
                              before);
         $this(discard);
     }
-    else if (type == PROCCESS) {
+    else if (type == PROCCESS)
         $this(proccess_found, (before != NULL), before);
-        *result = (void*)0x42;
-    }
 }
 
 static bool ignore_literals(buffer this, trilean *in_literal, char *found)

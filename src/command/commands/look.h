@@ -29,7 +29,7 @@ static bool ignore_literals(buffer this, trilean *in_literal, char *found);
 static char *index_inf(char *str, char motif, char *other);
 static void action(buffer this, action_type type, char **result, char *before);
 
-#define ACTION(x...) action(this, type, &result, x)
+#define ACTION(x...) action(this, type, copy, x)
 
 #define NEW_READ                                \
     if ($.read_index >= $.size || $.size == 0)  \
@@ -40,14 +40,14 @@ static void action(buffer this, action_type type, char **result, char *before);
     }
 
 #define END_OK                                          \
-    return (print_strs(this, after, NULL), result)
+    return (print_strs(this, after, NULL), true)
 
 #define END_KO                                                  \
     {                                                           \
-        if (result && type == COPY)                             \
+        if (copy && type == COPY)                               \
         {                                                       \
-            print_strs(this, result, NULL);                     \
-            free(result);                                       \
+            print_strs(this, copy, NULL);                       \
+            free(copy);                                         \
         }                                                       \
         if ($.data)                                             \
         {                                                       \
@@ -55,5 +55,5 @@ static void action(buffer this, action_type type, char **result, char *before);
             free($.data);                                       \
             $.data = NULL;                                      \
         }                                                       \
-        return 0;                                               \
+        return false;                                           \
     }
