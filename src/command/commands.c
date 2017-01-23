@@ -46,11 +46,11 @@ static bool look_func(buffer this, struct array args, bool swallow)
 #define DISPATCH dispatch(look_func, false)
 #include "create_command.h"
 
-#define COMMAND L_SWALLOW
+#define COMMAND LOOK_SW
 #define DISPATCH dispatch(look_func, true)
 #include "create_command.h"
 
-static bool balenced_func(buffer this, struct array args, bool swallow)
+static bool balanced_func(buffer this, struct array args, bool swallow)
 {
     char *in_tmp RAII = POP(),
         *out_tmp RAII = POP(),
@@ -68,12 +68,12 @@ static bool balenced_func(buffer this, struct array args, bool swallow)
     return balanced_look_for(this, in, out, before, after, swallow, PROCCESS, NULL);
 }
 
-#define COMMAND BALENCED
-#define DISPATCH dispatch(balenced_func, false)
+#define COMMAND BALANCED
+#define DISPATCH dispatch(balanced_func, false)
 #include "create_command.h"
 
-#define COMMAND B_SWALLOW
-#define DISPATCH dispatch(balenced_func, true)
+#define COMMAND BALANCED__SW
+#define DISPATCH dispatch(balanced_func, true)
 #include "create_command.h"
 
 #define COMMAND COUNTER

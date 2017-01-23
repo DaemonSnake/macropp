@@ -1,4 +1,4 @@
-#define case_b(value) case value [@BALENCED_SW '{' @, '}' @, break; @, : @]
+#define case_b(value) case value [@BALANCED '{' @, '}' @, break; @, : @]
 
 int main()
 {

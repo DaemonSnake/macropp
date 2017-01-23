@@ -17,7 +17,7 @@ ISSUES:
         -macro name should allow string as names
         dup_argument only if the motif is not inside a subargument
         -still issues with string literals (cpp without -P)
-        -LOOK & BALENCED are matching with commands !!
+        -LOOK & BALANCED are matching with commands !!
 
 INTEROGATIONS:
         -handle '\377' and 'xFF' for format
