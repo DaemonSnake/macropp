@@ -31,7 +31,7 @@ static void CMANGLE(constructor)()
     command_handler[__COUNTER__] = command_tool;
 }
 
-bool CMANGLE(command_handle)(buffer this, struct array args)
+bool CMANGLE(command_handle)(buffer this __attribute__((unused)), struct array args)
 # ifdef DISPATCH
 #  define dispatch(NAME, ARGS...) { return NAME(this, args, ##ARGS); }
      DISPATCH

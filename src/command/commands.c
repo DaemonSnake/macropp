@@ -227,6 +227,32 @@ static bool balenced_func(buffer this, struct array args, bool swallow)
     return false;
 }
 
+#define COMMAND ALT
+#define THREADS false
+#include "create_command.h"
+{
+    struct array arg_list[args.size];
+    struct handler_content handlers[args.size];
+    unsigned i = 0;
+
+    while (args.size)
+    {
+        char *it_list RAII = POP();
+        bzero(&arg_list[i], sizeof(arg_list[i]));
+        fill_argument_list_from_string(it_list + IN_STR_SIZE, &arg_list[i]);
+        if (!find_command(&arg_list[i], &handlers[i]))
+            continue ;
+        if (!handlers[i].allow_thread) {
+            CLEAN();
+            return handlers[i].handler(this, arg_list[i]);
+        }
+        i++;
+    }
+    CLEAN();
+    //SMTHNG
+    return true;
+}
+
 FINISH_COMMANDS;
 
 bool find_command(struct array *args, struct handler_content *ret)

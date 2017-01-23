@@ -78,6 +78,8 @@ struct array
     unsigned size;
 };
 
+struct handler_content;
+
 //BUFFER
 buffer buffer_new(int in, int out);
 buffer buffer_new_string(char *str, int out);
@@ -99,6 +101,7 @@ size_t pop_front_argument_hash(struct array *arg);
 unsigned pop_front_argument_to_uint(struct array *arg);
 int pop_front_argument_to_int(struct array *arg);
 double pop_front_argument_to_double(struct array *arg);
+bool find_command(struct array *args, struct handler_content *ret);
 
 //TOOLS
 void free_all(void *, ...);
