@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 #include "macro++.h"
-#include "tools/list.c"
+#include "tools/list.h"
 
 NEW_SUBCOMMAND(LIST, PRINT)
 {

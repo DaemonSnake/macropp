@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 #include "macro++.h"
-#include "tools/macro.c"
+#include "tools/macro.h"
 
 NEW_SUBCOMMAND(MACRO_OP, UNDEF)
 {

@@ -1,5 +1,5 @@
 #include "macro++.h"
-#include "look.h"
+#include "tools/look.h"
 
 bool look_for(buffer this, char *motif, char *before, char *after,
               bool swallow, action_type type, char **copy)
