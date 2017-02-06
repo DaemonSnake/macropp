@@ -23,29 +23,34 @@
 
 static size_t counter_value = 0;
 
-static void counter_preface(buffer this, struct array *args)
-{
+NEW_SUBCOMMAND(COUNTER, VALUE) {
     char *to_mangle RAII = POP();
 
     if (to_mangle)
         print_strs(this, to_mangle, "__", NULL);
     CLEAN();
-}
-
-NEW_SUBCOMMAND(COUNTER, VALUE) {
-    counter_preface(this, &args);
     print_size(this, counter_value);
     return true;
 }
 
 NEW_SUBCOMMAND(COUNTER, NEXT) {
-    counter_preface(this, &args);
-    print_size(this, counter_value++);
+    CLEAN();
+    counter_value++;
     return true;
 }
 
 NEW_SUBCOMMAND(COUNTER, PREV) {
-    counter_preface(this, &args);
-    print_size(this, (counter_value == 0 ? 0 : counter_value--));
+    CLEAN();
+    counter_value--;
+    return true;
+}
+
+NEW_SUBCOMMAND(COUNTER, SET) {
+    int value = POP(int);
+
+    CLEAN();
+    if (value < 0)
+        return false;
+    counter_value = value;
     return true;
 }

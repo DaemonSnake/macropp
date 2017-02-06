@@ -14,6 +14,7 @@ char *tmp = "[@ YOLO @] {}";
 
 [@COUNTER VALUE @]
 [@COUNTER NEXT @]
+[@COUNTER VALUE @]
 [@COUNTER PREV @]
 [@COUNTER VALUE @]
 [@COUNTER VALUE @, YOLO @]

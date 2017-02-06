@@ -78,9 +78,10 @@ static bool balanced_func(buffer this, struct array args, bool swallow)
 
 #define COMMAND COUNTER
 #define SUBCOMMANDS                                       \
-    subcommand(VALUE, true)                               \
-    subcommand(NEXT, true)                                \
-    subcommand(PREV, true)
+    subcommand(VALUE, true)                                \
+    subcommand(NEXT, false)                                \
+    subcommand(PREV, false)                                \
+    subcommand(SET, false)
 #include "create_command.h"
 
 #define COMMAND STRLEN

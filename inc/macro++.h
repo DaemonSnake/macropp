@@ -98,9 +98,9 @@ char *pop_front_argument(struct array *arg);
 void free_arguments(struct array *);
 bool fill_argument_list_from_string(char *arg_list, struct array *res);
 size_t pop_front_argument_hash(struct array *arg);
-unsigned pop_front_argument_to_uint(struct array *arg);
-int pop_front_argument_to_int(struct array *arg);
-double pop_front_argument_to_double(struct array *arg);
+unsigned pop_front_argument_uint(struct array *arg);
+int pop_front_argument_int(struct array *arg);
+double pop_front_argument_double(struct array *arg);
 bool find_command(struct array *args, struct handler_content *ret);
 
 //TOOLS

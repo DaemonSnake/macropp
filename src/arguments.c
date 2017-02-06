@@ -242,7 +242,7 @@ size_t pop_front_argument_hash(struct array *arg)
     return hash_string(name);
 }
 
-unsigned pop_front_argument_to_uint(struct array *arg)
+unsigned pop_front_argument_uint(struct array *arg)
 {
     char *name RAII = pop_front_argument(arg);
     int res = (name == NULL ? 0 : atoi(name));
@@ -250,13 +250,13 @@ unsigned pop_front_argument_to_uint(struct array *arg)
     return (unsigned)(res < 0 ? 0 : res);
 }
 
-int pop_front_argument_to_int(struct array *arg)
+int pop_front_argument_int(struct array *arg)
 {
     char *name RAII = pop_front_argument(arg);
     return (name == NULL ? 0 : atoi(name));
 }
 
-double pop_front_argument_to_double(struct array *arg)
+double pop_front_argument_double(struct array *arg)
 {
     char *name RAII = pop_front_argument(arg);
     double res = (name == NULL ? 0 : atof(name));

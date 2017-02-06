@@ -86,7 +86,7 @@ NEW_SUBCOMMAND(LIST, REMOVE)
 
     while (args.size > 0)
     {
-        int value = POP(to_int);
+        int value = POP(int);
         if (value < 0)
             break;
         list_remove_item(node, (unsigned)value);
@@ -98,7 +98,7 @@ NEW_SUBCOMMAND(LIST, REMOVE)
 NEW_SUBCOMMAND(LIST, ITEM)
 {
     struct list_node *node = find_list_node(POP(hash));
-    int value = POP(to_int);
+    int value = POP(int);
 
     CLEAN();
     if (value < 0)
@@ -119,7 +119,7 @@ NEW_SUBCOMMAND(LIST, CLEAR)
 NEW_SUBCOMMAND(LIST, EVAL)
 {
     struct list_node *node = find_list_node(POP(hash));
-    int index = POP(to_int);
+    int index = POP(int);
 
     CLEAN();
     if (index < 0)
