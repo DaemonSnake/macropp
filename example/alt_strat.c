@@ -1,7 +1,9 @@
 thread main_loop
 {
-    c1 = create command_1(in_buff);
-    c2 = create command_2(new transfer buffer(c1));
+    b1 = new transfer buffer(in_buff);
+    b2 = new transfer buffer(b1);
+    c1 = create command_1(b1);
+    c2 = create command_2(b2);
 }
 
 thread command_1
