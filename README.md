@@ -18,6 +18,7 @@ it as pure text.</p>
 <p>Even more a command(s) can be used to produce new commands.</br>
 </p>
 example:</br>
+
 ```c
 [@FORMAT "%OPEN" @]COMMAND_NAME ARG_0 [@FORMAT "%CLOSE" @]
 ```
@@ -33,73 +34,85 @@ will have the same effect as
 <h4>Here goes the list of the commands :</h4>
 
 <h3>Description of each command</h3>
-- BALANCED(_SW)</br>
-</br>Description:</br>
-</br>SW stands for swallow and removes the IN and OUT character!</br>
-</br>Syntax:</br>
+- BALANCED(_SW)
+Description:
+SW stands for swallow and removes the IN and OUT character!<br>
+Syntax:
+
 ```ebnf
 [@BALANCED|BALANCED_SW 'IN' @, 'OUT' @, AFTER (@, BEFORE) @]
 ```
 <h6>Example</h6>
-input file:</br>
+input file:
+
 ```c
 [@BALANCED '{' @, '}' @, printf("after block\n"); @, printf("before block\n"); @]
 {
 }
 ```
-output:</br>
+output:
+
 ```c
 printf("before block\n");
 {
 }printf("after block\n");
 ```
-- LOOK(_SW)</br>
-</br>Description:</br>
-</br>SW stands for swallow and removes the IN and OUT character!</br>
-</br>Syntax:</br>
+- LOOK(_SW)
+Description:
+SW stands for swallow and removes the IN and OUT character!
+Syntax:
+
 ```ebnf
 [@LOOK|LOOK_SW WHAT @, AFTER (@, BEFORE) @]
 ```
 <h6>Example</h6>
-input file:</br>
+input file:
+
 ```c
 [@LOOK TEST @, BEFORE_ @, _AFTER @] ... TEST ...
 ```
-output:</br>
+output:
+
 ```c
 ... BEFORE_TEST_AFTER ...
 ```
 
-- MACRO(_OP)</br>
-- FORMAT</br>
-</br>Description:</br>
-</br>Syntax:</br>
+- MACRO(_OP)
+- FORMAT
+Description:
+Syntax:
+
 ```ebnf
 [@FORMAT STRING_LITERAL (@, ARGUMENTS)* @]
 ```
 <h6>Example</h6>
-input file:</br>
+input file:
+
 ```c
 [@FORMAT "A%Z" @, BCDEFGHIJKLMNOPQRSTUVWXY @]
 ```
-output:</br>
+output:
+
 ```c
 ABCDEFGHIJKLMNOPQRSTUVWXYZ
 ```
-- STRLEN</br>
-</br>
+- STRLEN
+
 Description:
-<p>find the length of a string literal and replace the command with said length in text<p>
-</br>Syntax:
+find the length of a string literal and replace the command with said length in text
+Syntax:
+
 ```ebnf
 [@STRLEN STRING_LITERAL @]
 ```
 <h6>Example</h6>
-input file:</br>
+input file:
+
 ```c
 [@STRLEN "Hello world!" @]
 ```
-output:</br>
+output:
+
 ```c
 12
 ```
